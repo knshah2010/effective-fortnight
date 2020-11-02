@@ -1,0 +1,25 @@
+{
+  "KeyPatternRule": {
+    "fields": "*",
+    "Where": [
+      {
+        "PropertyName": "module_name",
+        "PropertyValue": "?"
+      },
+      {
+        "PropertyName": "module_code",
+        "PropertyValue": "?"
+      }
+    ],
+    "join": [
+      {
+        "table": "key_pattern_for",
+        "condition": "key_pattern_for.key_pattern_for_code=key_pattern_rule.key_pattern_for_code"
+      },
+      {
+        "table": "company_key_pattern",
+        "condition": "company_key_pattern.key_pattern_rule_code=company_key_pattern.key_pattern_rule_code"
+      }
+    ]
+  }
+}

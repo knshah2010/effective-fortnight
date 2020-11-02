@@ -1,0 +1,5 @@
+O:\Roshani\Projects\DataExchangeAPI\DataExchangeApi\MasterDataExchange\obj\Debug\netcoreapp2.2\MasterDataExchange.csprojAssemblyReference.cache
+O:\Roshani\Projects\DataExchangeAPI\DataExchangeApi\MasterDataExchange\obj\Debug\netcoreapp2.2\MasterDataExchange.RazorAssemblyInfo.cache
+O:\Roshani\Projects\DataExchangeAPI\DataExchangeApi\MasterDataExchange\obj\Debug\netcoreapp2.2\MasterDataExchange.RazorAssemblyInfo.cs
+O:\Roshani\Projects\DataExchangeAPI\DataExchangeApi\MasterDataExchange\obj\Debug\netcoreapp2.2\MasterDataExchange.AssemblyInfoInputs.cache
+O:\Roshani\Projects\DataExchangeAPI\DataExchangeApi\MasterDataExchange\obj\Debug\netcoreapp2.2\MasterDataExchange.AssemblyInfo.cs

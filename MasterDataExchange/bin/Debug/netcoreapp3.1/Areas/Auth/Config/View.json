@@ -1,0 +1,19 @@
+{
+  "role_view": {
+    "table": "role",
+    "fields": "role_code,role_name,organisation_type,description",
+    "require": "role_code"
+  },
+
+  "permission_view": {
+    "table": "permission",
+    "fields": "permission_code,permission_name,organisation_type,description",
+    "require": "permission_code"
+  },
+
+  "actions_view": {
+    "table": "actions",
+    "fields": "action_code,action_name,action_url,description,menu_level",
+    "require": "action_code"
+  }
+}

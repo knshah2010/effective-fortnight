@@ -1,0 +1,23 @@
+{
+  //state dropdown
+  "users": {
+    "model": "users",
+    "fields": "user_code,user_name"
+  },
+
+
+  //permission dropdown
+  "permission": {
+    "model": "permission",
+    "fields": "permission.permission_code,permission.permission_name"
+  },
+
+  //role dropdown from org_type
+  "role": {
+    "model": "role",
+    "fields": "role.role_code,role.role_name",
+    "where_data": "organisation_type"
+  }
+
+
+}

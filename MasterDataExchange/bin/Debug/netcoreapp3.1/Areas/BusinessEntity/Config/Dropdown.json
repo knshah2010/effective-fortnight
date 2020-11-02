@@ -1,0 +1,88 @@
+{
+  "plant": {
+    "model": "plant",
+    "distinct": "distinct",
+    "fields": "plant.plant_code,CONCAT(plant.plant_name,' - ',b.plant_tr_code) as plant_name",
+    "join": [
+      {
+        "table": "business_hierarchy as b",
+        "condition": "b.plant_code=plant.plant_code and b.plant_tr_code is not null and b.mcc_code is null and is_default=1"
+      },
+      {
+        "table": "user_organization_mapping uom",
+        "condition": "b.plant_code=isnull(uom.plant_code,b.plant_code)  and uom.user_code = @rls_user_code"
+      }
+    ],
+    "where_data": "b.company_code"
+  },
+
+  "mcc": {
+    "model": "mcc",
+    "distinct": "distinct",
+    "fields": "mcc.mcc_code, CONCAT(mcc.mcc_name,' - ',b.mcc_tr_code) as mcc_name",
+    "join": [
+      {
+        "table": "business_hierarchy as b",
+        "condition": "b.mcc_code=mcc.mcc_code and b.mcc_tr_code is not null and b.bmc_code is null and is_default=1"
+      },
+      {
+        "table": "user_organization_mapping uom",
+        "condition": "b.plant_code=isnull(uom.plant_code,b.plant_code) and b.mcc_code=isnull(uom.mcc_code,b.mcc_code) and  uom.user_code=@rls_user_code"
+      }
+    ],
+    "where_data": "b.plant_code"
+  },
+
+  "bmc": {
+    "model": "bmc",
+    "distinct": "distinct",
+    "fields": "bmc.bmc_code,CONCAT(bmc.bmc_name,' - ',b.bmc_tr_code) as bmc_name",
+    "join": [
+      {
+        "table": "business_hierarchy as b",
+        "condition": "b.bmc_code=bmc.bmc_code and b.bmc_tr_code is not null and (b.route_code is null or b.route_code=0) and is_default=1"
+      },
+      {
+        "table": "user_organization_mapping uom",
+        "condition": "b.plant_code=isnull(uom.plant_code,b.plant_code) and b.mcc_code=isnull(uom.mcc_code,b.mcc_code) and b.bmc_code=isnull(uom.bmc_code,b.bmc_code) and uom.user_code=@rls_user_code"
+      }
+    ],
+    "where_data": "b.mcc_code"
+  },
+
+  "mpp": {
+    "model": "mpp",
+    "distinct": "distinct",
+    "fields": "mpp.mpp_code,convert(int,right(mpp_tr_code,3)),CONCAT(mpp.mpp_name,' - ',b.mpp_tr_code) as mpp_name",
+    "join": [
+      {
+        "table": "business_hierarchy as b",
+        "condition": "b.mpp_code=mpp.mpp_code and b.mpp_tr_code is not null and b.is_default=1"
+      },
+      {
+        "table": "business_address_detail ba",
+        "condition": "b.mpp_code=ba.module_code and ba.module_name='mpp' and ba.is_default=1 and ba.hamlet_code is not null"
+      },
+      {
+        "table": "user_organization_mapping uom",
+        "condition": "b.plant_code=isnull(uom.plant_code,b.plant_code) and b.mcc_code=isnull(uom.mcc_code,b.mcc_code) and b.bmc_code=isnull(uom.bmc_code,b.bmc_code) and b.mpp_code=isnull(uom.mpp_code,b.mpp_code) and uom.user_code=@rls_user_code"
+      }
+    ],
+    "where_data": "b.bmc_code,route_code",
+    "orderby": "convert(int,right(mpp_tr_code,3))"
+  },
+
+  "member": {
+    "model": "member_master",
+    "fields": "member_master.member_code,CONCAT(member_name,' - ',msh.member_tr_code) as member_name",
+    "join": [
+      {
+        "table": "member_sahayak_hierarchy as msh",
+        "condition": "member_master.member_code=msh.member_code and msh.member_tr_code is not null and is_default=1"
+      }
+    ],
+    "where_data": "mpp_code",
+    "orderby": "convert(int,right(member_tr_code,4))"
+  }
+
+}

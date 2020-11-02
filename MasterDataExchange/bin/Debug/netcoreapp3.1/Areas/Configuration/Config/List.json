@@ -1,0 +1,94 @@
+{
+  "shift": {
+    "table": "shift",
+    "fields": "shift_code,shift_name,shift_short_name,shift_at,is_active",
+    "orderby": "shift_code",
+    "distinct": "distinct"
+  },
+
+  "milk_quality_param": {
+    "table": "milk_quality_param",
+    "fields": "milk_quality_param_code,param,rate_chart,is_collection",
+    "orderby": "milk_quality_param_code",
+    "distinct": "distinct"
+  },
+
+  "milk_quality_type": {
+    "table": "milk_quality_type",
+    "fields": "milk_quality_type_code,milk_quality_type_name,is_active",
+    "orderby": "milk_quality_type_code",
+    "distinct": "distinct"
+  },
+
+  "milk_type": {
+    "table": "milk_type",
+    "fields": "milk_type_code,milk_type_name,milk_type_short_name,is_milch,is_collection,is_active",
+    "orderby": "milk_type_code",
+    "distinct": "distinct"
+  },
+
+  "department": {
+    "table": "department",
+    "fields": "department_code,department_name,is_active",
+    "orderby": "department_code",
+    "distinct": "distinct"
+  },
+  "approval_stage_master": {
+    "table": "approval_stage_master",
+    "fields": "approval_stage_master_code,approval_type,stages as levels,approval_mode,wef_date",
+    "orderby": "approval_stage_master_code"
+  },
+  "approval_stage": {
+    "table": "approval_stage",
+    "fields": "approval_stage_code,approval_stage_master_code,levels,is_action as action_taken,status_type,department.department_code,department.department_name",
+    "join": [
+      {
+        "table": "department",
+        "condition": "approval_stage.department_code=department.department_code"
+      }
+    ],
+    "orderby": "approval_stage_code"
+  },
+  "generalconfigurationtxn": {
+    "Fields": "concat(configuration_key,'##',configuration_result_key,'##',configuration_result) as configuration_result",
+    "Table": "general_configuration_txn",
+    "require": "configuration_key",
+    "is_header": "true"
+  },
+  "tax": {
+    "Fields": "t.tax_code,t.tax_name,tg.tax_group_code,tg.tax_group_name,t.company_code,c.company_name",
+    "Table": "tax as t",
+    "join": [
+      {
+        "table": "tax_group as tg",
+        "condition": "tg.tax_group_code=t.tax_group_code"
+      },
+      {
+        "table": "company as c",
+        "condition": "c.company_code=t.company_code"
+      }
+    ],
+    "orderby": "t.tax_name"
+  },
+  "taxbasic": {
+    "Fields": "basic_tax_code,basic_tax_name",
+    "Table": "tax_basic",
+    "orderby": "basic_tax_name"
+  },
+  "unit": {
+    "Fields": "unit_code,unit,unit_short_name",
+    "Table": "unit",
+    "orderby": "unit"
+  },
+  "taxgroup": {
+    "Fields": "tax_group_code,tax_group_name",
+    "Table": "tax_group",
+    "orderby": "tax_group_name"
+  },
+
+  "financial_year": {
+    "table": "financial_year",
+    "fields": "financial_year_code,financial_year,start_date,end_date,is_active",
+    "require": "financial_year_code"
+  }
+}

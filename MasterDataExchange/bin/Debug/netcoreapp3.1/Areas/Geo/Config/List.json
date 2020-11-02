@@ -1,0 +1,99 @@
+{
+  "state": {
+    "Fields": "state_code,state_name,language_code,is_active",
+    "Table": "states",
+    "OrderBy": "state_name"
+  },
+
+  "district": {
+    "fields": "states.state_code,states.state_name,d.district_code,district_name,d.is_active",
+    "table": "district d",
+    "join": [
+      {
+        "table": "geo_mapping",
+        "condition": "geo_mapping.district_code=d.district_code"
+      },
+      {
+        "table": "states",
+        "condition": "geo_mapping.state_code=states.state_code"
+      }
+    ],
+    "require": "states.state_code",
+    "distinct": "distinct"
+  },
+
+  "tehshil": {
+    "fields": "states.state_code,states.state_name,district.district_code,district.district_name,tehshil.tehshil_code,tehshil.tehshil_name,tehshil.is_active",
+    "table": "tehshil as tehshil",
+    "join": [
+      {
+        "table": "geo_mapping as GM",
+        "condition": "GM.tehshil_code=tehshil.tehshil_code"
+      },
+      {
+        "table": "states as states",
+        "condition": "GM.state_code=states.state_code"
+      },
+      {
+        "table": "district as district",
+        "condition": "GM.district_code=district.district_code"
+      }
+    ],
+    "require": "district.district_code",
+    "distinct": "distinct"
+  },
+
+  "village": {
+    "fields": "states.state_code,states.state_name,district.district_code,district.district_name,tehshil.tehshil_code,tehshil.tehshil_name,village.village_code,village.village_name ,village.is_active",
+    "table": "village",
+    "join": [
+      {
+        "table": "geo_mapping as GM",
+        "condition": "GM.village_code=village.village_code"
+      },
+      {
+        "table": "states as states",
+        "condition": "GM.state_code=states.state_code"
+      },
+      {
+        "table": "district as district",
+        "condition": "GM.district_code=district.district_code"
+      },
+      {
+        "table": "tehshil as tehshil",
+        "condition": "GM.tehshil_code=tehshil.tehshil_code"
+      }
+    ],
+    "require": "tehshil.tehshil_code",
+    "distinct": "distinct"
+  },
+
+  "hamlet": {
+    "fields": "states.state_code,states.state_name,district.district_code,district.district_name,tehshil.tehshil_code,tehshil.tehshil_name,village.village_code,village.village_name,hamlet.hamlet_code,hamlet.hamlet_name,hamlet.is_active",
+    "table": "hamlet",
+    "join": [
+      {
+        "table": "geo_mapping as GM",
+        "condition": "GM.hamlet_code=hamlet.hamlet_code"
+      },
+      {
+        "table": "states as states",
+        "condition": "GM.state_code=states.state_code"
+      },
+      {
+        "table": "district as district",
+        "condition": "GM.district_code=district.district_code"
+      },
+      {
+        "table": "tehshil as tehshil",
+        "condition": "GM.tehshil_code=tehshil.tehshil_code"
+      },
+      {
+        "table": "village as village",
+        "condition": "GM.village_code=village.village_code"
+      }
+    ],
+    "require": "village.village_code",
+    "distinct": "distinct"
+  }
+}

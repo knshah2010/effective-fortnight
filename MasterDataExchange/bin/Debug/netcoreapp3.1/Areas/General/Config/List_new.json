@@ -1,0 +1,470 @@
+{
+  "states": {
+    "fields": "state_code,state_name,language_code,is_active"
+  },
+
+  "district": {
+    "fields": "states.state_name,states.state_code,district.district_code,district_name,district.is_active",
+    "join": [
+      {
+        "table": "geo_mapping",
+        "condition": "geo_mapping.district_code=district.district_code"
+      },
+      {
+        "table": "states",
+        "condition": "geo_mapping.state_code=states.state_code"
+      }
+    ],
+    "where_data": "states.state_code"
+  },
+
+  "tehshil": {
+    "fields": "S.state_code,S.state_name,D.district_code,D.district_name,tehshil.tehshil_code,tehshil.tehshil_name,tehshil.is_active",
+    "join": [
+      {
+        "table": "geo_mapping as GM",
+        "condition": "GM.tehshil_code=tehshil.tehshil_code"
+      },
+      {
+        "table": "states as S",
+        "condition": "GM.state_code=S.state_code"
+      },
+      {
+        "table": "district as D",
+        "condition": "GM.district_code=D.district_code"
+      }
+    ],
+    "where_data": "D.district_code"
+  },
+
+  "village": {
+    "fields": "S.state_code,S.state_name,D.district_code,D.district_name,T.tehshil_code,T.tehshil_name,village.village_code,village.village_name ,village.is_active",
+    "join": [
+      {
+        "table": "geo_mapping as GM",
+        "condition": "GM.village_code=village.village_code"
+      },
+      {
+        "table": "states as S",
+        "condition": "GM.state_code=S.state_code"
+      },
+      {
+        "table": "district as D",
+        "condition": "GM.district_code=D.district_code"
+      },
+      {
+        "table": "tehshil as T",
+        "condition": "GM.tehshil_code=T.tehshil_code"
+      }
+    ],
+    "where_data": "T.tehshil_code"
+  },
+
+  "hamlet": {
+    "fields": "S.state_code,S.state_name,D.district_code,D.district_name,T.tehshil_code,T.tehshil_name,V.village_code,V.village_name,hamlet.hamlet_code,hamlet.hamlet_name,hamlet.is_active",
+    "join": [
+      {
+        "table": "geo_mapping as GM",
+        "condition": "GM.hamlet_code=hamlet.hamlet_code"
+      },
+      {
+        "table": "states as S",
+        "condition": "GM.state_code=S.state_code"
+      },
+      {
+        "table": "district as D",
+        "condition": "GM.district_code=D.district_code"
+      },
+      {
+        "table": "tehshil as T",
+        "condition": "GM.tehshil_code=T.tehshil_code"
+      },
+      {
+        "table": "village as V",
+        "condition": "GM.village_code=V.village_code"
+      }
+    ],
+    "where_data": "V.village_code"
+  },
+  "bank": {
+    "fields": "bank_code,bank_name,checked_ac_no,is_active,nationalized_bank,short_name,ac_no_length"
+  },
+  "branch": {
+    "fields": "branch_code,branch_name,ifsc,wef_date,is_active",
+    "where_data": "bank_code"
+  },
+  "company_group": {
+    "fields": "company_group_code,company_group_name,company_group_ex_code,company_group_short_name"
+  },
+  "company": {
+    "fields": "company_code,company_name,company_ex_code,company_short_name"
+  },
+  "plant": {
+    "fields": "plant.plant_code,plant.plant_name,plant.is_active,plant.plant_ex_code,company.company_name,district_name,tehshil_name,village_name,hamlet_name,bcd.mob_no",
+    "join": [
+      {
+        "table": "business_hierarchy as b",
+        "condition": "b.plant_code=plant.plant_code and b.mcc_code is null and b.bmc_code is null"
+      },
+      {
+        "table": "company",
+        "condition": "company.company_code=b.company_code"
+      },
+      {
+        "type": "left",
+        "table": "business_address_detail ba",
+        "condition": "ba.module_code=plant.plant_code and ba.module_name='plant' and is_default='1'"
+      },
+      {
+        "type": "left",
+        "table": "district",
+        "condition": "ba.district_code=district.district_code"
+      },
+      {
+        "type": "left",
+        "table": "tehshil",
+        "condition": "ba.tehsil_code=tehshil.tehshil_code"
+      },
+      {
+        "type": "left",
+        "table": "village",
+        "condition": "ba.village_code=village.village_code"
+      },
+      {
+        "type": "left",
+        "table": "hamlet",
+        "condition": "ba.hamlet_code=hamlet.hamlet_code"
+      },
+      {
+        "type": "left",
+        "table": "business_contact_detail bcd",
+        "condition": "bcd.module_code=plant.plant_code and bcd.module_name='plant'"
+      }
+    ],
+    "where_data": "b.company_code"
+  },
+  "mcc": {
+    "fields": "mcc.mcc_code,mcc.mcc_name,mcc.is_active,mcc.mcc_ex_code,plant.plant_name, district_name,tehshil_name,village_name,hamlet_name,bcd.mob_no",
+    "join": [
+      {
+        "table": "business_hierarchy as b",
+        "condition": "b.mcc_code=mcc.mcc_code and b.bmc_code is null"
+      },
+      {
+        "table": "plant",
+        "condition": "plant.plant_code=b.plant_code"
+      },
+      {
+        "type": "left",
+        "table": "business_address_detail ba",
+        "condition": "ba.module_code=mcc.mcc_code and ba.module_name='mcc' and is_default='1'"
+      },
+      {
+        "type": "left",
+        "table": "district",
+        "condition": "ba.district_code=district.district_code"
+      },
+      {
+        "type": "left",
+        "table": "tehshil",
+        "condition": "ba.tehsil_code=tehshil.tehshil_code"
+      },
+      {
+        "type": "left",
+        "table": "village",
+        "condition": "ba.village_code=village.village_code"
+      },
+      {
+        "type": "left",
+        "table": "hamlet",
+        "condition": "ba.hamlet_code=hamlet.hamlet_code"
+      },
+      {
+        "type": "left",
+        "table": "business_contact_detail bcd",
+        "condition": "bcd.module_code=mcc.mcc_code and bcd.module_name='mcc'"
+      }
+    ],
+    "where_data": "b.plant_code"
+  },
+  "bmc": {
+    "fields": "bmc.bmc_code,bmc.bmc_name,bmc.is_active,bmc.bmc_ex_code,mcc.mcc_name,district_name,tehshil_name,village_name,hamlet_name,bcd.mob_no",
+    "join": [
+      {
+        "table": "business_hierarchy as b",
+        "condition": "b.bmc_code=bmc.bmc_code "
+      },
+      {
+        "table": "mcc",
+        "condition": "mcc.mcc_code=b.mcc_code"
+      },
+      {
+        "type": "left",
+        "table": "business_address_detail ba",
+        "condition": "ba.module_code=bmc.bmc_code  and ba.module_name='bmc' and is_default='1'"
+      },
+      {
+        "type": "left",
+        "table": "district",
+        "condition": "ba.district_code=district.district_code"
+      },
+      {
+        "type": "left",
+        "table": "tehshil",
+        "condition": "ba.tehsil_code=tehshil.tehshil_code"
+      },
+      {
+        "type": "left",
+        "table": "village",
+        "condition": "ba.village_code=village.village_code"
+      },
+      {
+        "type": "left",
+        "table": "hamlet",
+        "condition": "ba.hamlet_code=hamlet.hamlet_code"
+      },
+      {
+        "type": "left",
+        "table": "business_contact_detail bcd",
+        "condition": "bcd.module_code=bmc.bmc_code  and bcd.module_name='bmc'"
+      }
+    ],
+    "where_data": "b.mcc_code"
+  },
+
+  "registration": {
+    "fields": "registration_details_code,registration_date,registration_no,gst_no,fssiai,msme_no ,pan_no,service_tax,tan_no,wef_date,is_default,tds_per,security_amount,security_cheque_no",
+    "where_data": "module_name,module_code"
+  },
+  "business_address_detail": {
+    "fields": "address_details_code,address,city,pincode,fax_no,phone_no,email_id,websites,wef_date,is_default,state_code,district_code,tehsil_code,village_code,hamlet_code",
+    "where_data": "module_name,module_code"
+  },
+  "business_bank_detail": {
+    "fields": "bank_detail_code,bank_account_no,ifsc,bank_code,branch_code,upi,wef_date,is_default",
+    "where_data": "module_name,module_code"
+  },
+  "business_contact_detail": {
+    "fields": "contact_details_code,first_name,last_name,sur_name,department_code,department.department_name,designation,pan_no,aadhar_no,wef_date,is_default,driving_license_no,license_expiry_date,billing_type_code,agreement_from_date,agreement_no,agreement_to_date,declaration",
+    "join": [
+      {
+        "table": "department",
+        "condition": "department.department_code=business_contact_detail.department_code"
+      }
+    ],
+    "where_data": "module_name,module_code"
+  },
+
+
+  "mpp": {
+    "fields": "mpp.mpp_code,mpp.mpp_ex_code,mpp.mpp_name,mpp.mpp_short_name,bmc.bmc_name,district_name,tehshil_name,village_name,hamlet_name,bcd.mob_no",
+    "join": [
+      {
+        "table": "business_hierarchy as b",
+        "condition": "b.mpp_code=mpp.mpp_code "
+      },
+      {
+        "table": "bmc",
+        "condition": "bmc.bmc_code=b.bmc_code"
+      },
+      {
+        "type": "left",
+        "table": "business_address_detail ba",
+        "condition": "ba.module_code=mpp.mpp_code and ba.module_name='mpp' and is_default='1'"
+      },
+      {
+        "type": "left",
+        "table": "district",
+        "condition": "ba.district_code=district.district_code"
+      },
+      {
+        "type": "left",
+        "table": "tehshil",
+        "condition": "ba.tehsil_code=tehshil.tehshil_code"
+      },
+      {
+        "type": "left",
+        "table": "village",
+        "condition": "ba.village_code=village.village_code"
+      },
+      {
+        "type": "left",
+        "table": "hamlet",
+        "condition": "ba.hamlet_code=hamlet.hamlet_code"
+      },
+      {
+        "type": "left",
+        "table": "business_contact_detail bcd",
+        "condition": "bcd.module_code=mpp.mpp_code and bcd.module_name='mpp'"
+      }
+    ],
+    "where_data": "b.bmc_code"
+  },
+  "collection_point": {
+    "fields": "collection_point_code,is_active,wef_date",
+    "where_data": "mpp_code"
+  },
+  "party_group": {
+    "fields": "party_group.party_group_code,party_group.party_group_name,party_group.is_active"
+  },
+  "party_master": {
+    "fields": "party_master.party_master_code,party_master.party_name,party_master.company_code,company_name,district_name,tehshil_name,village_name,hamlet_name,bcd.mob_no",
+    "join": [
+      {
+        "table": "company ",
+        "condition": "company.company_code=party_master.company_code "
+      },
+      {
+        "type": "left",
+        "table": "business_address_detail ba",
+        "condition": "ba.module_code=party_master.party_master_code and ba.module_name='party_master' and is_default='1' "
+      },
+      {
+        "type": "left",
+        "table": "district",
+        "condition": "ba.district_code=district.district_code"
+      },
+      {
+        "type": "left",
+        "table": "tehshil",
+        "condition": "ba.tehsil_code=tehshil.tehshil_code"
+      },
+      {
+        "type": "left",
+        "table": "village",
+        "condition": "ba.village_code=village.village_code"
+      },
+      {
+        "type": "left",
+        "table": "hamlet",
+        "condition": "ba.hamlet_code=hamlet.hamlet_code"
+      },
+      {
+        "type": "left",
+        "table": "business_contact_detail bcd",
+        "condition": "bcd.module_code=party_master.party_master_code  and bcd.module_name='party_master'"
+      }
+    ]
+  },
+
+  "sahayak": {
+    "fields": "sahayak.sahayak_code,sahayak.sahayak_name,sahayak.sahayak_ex_code,mpp.mpp_name,district_name,tehshil_name,village_name,hamlet_name,mcd.mob_no",
+    "join": [
+      {
+        "table": "member_sahayak_hierarchy as b",
+        "condition": "b.sahayak_code=sahayak.sahayak_code "
+      },
+      {
+        "table": "mpp",
+        "condition": "mpp.mpp_code=b.mpp_code"
+      },
+      {
+        "type": "left",
+        "table": "member_sahayak_address_detail ba",
+        "condition": "ba.module_code=sahayak.sahayak_code and ba.module_name='sahayak'  and is_default='1'"
+      },
+      {
+        "type": "left",
+        "table": "district",
+        "condition": "ba.district_code=district.district_code"
+      },
+      {
+        "type": "left",
+        "table": "tehshil",
+        "condition": "ba.tehsil_code=tehshil.tehshil_code"
+      },
+      {
+        "type": "left",
+        "table": "village",
+        "condition": "ba.village_code=village.village_code"
+      },
+      {
+        "type": "left",
+        "table": "hamlet",
+        "condition": "ba.hamlet_code=hamlet.hamlet_code"
+      },
+      {
+        "type": "left",
+        "table": "member_sahayak_contact_detail mcd",
+        "condition": "mcd.module_code=sahayak.sahayak_code and ba.module_name='sahayak' "
+      }
+    ],
+    "where_data": "b.mpp_code"
+  },
+  "member_sahayak_address_detail": {
+    "fields": "address_details_code,address,city,pincode,fax_no,phone_no,email_id,websites,wef_date,is_default,state_code,district_code,tehsil_code,village_code,hamlet_code",
+    "where_data": "module_name,module_code"
+  },
+  "member_sahayak_bank_detail": {
+    "fields": "bank_detail_code,bank_account_no,ifsc,bank_code,branch_code,upi,wef_date,is_default",
+    "where_data": "module_name,module_code"
+  },
+  "member_sahayak_contact_detail": {
+    "fields": "contact_details_code,first_name,last_name,sur_name,department_code,designation,pan_no,aadhar_no,wef_date,is_default,driving_licence_no,licence_expiry_date,billing_type_code,agreement_from_date,agreement_no,agreement_to_date,declaration",
+    "where_data": "module_name,module_code"
+  },
+  "vehicle_master": {
+    "fields": "vehicle_code,vehicle_type,parsing_no,capacity,applicable_rto,average,rc_book_no,is_active",
+    "where_data": "party_master_code"
+  },
+  "vehicle_detail": {
+    "fields": "vehicle_detail_code,vehicle_master_code,billing_type,insurance,pollution_certificate,rent,wef_date",
+    "where_data": "vehicle_master_code"
+  },
+  "route": {
+    "fields": "route.route_code,route.route_name,route_type"
+  },
+  "route_other_info_for_km": {
+    "fields": "route_other_info_km_code,morning_extra_km,evening_extra_km,morning_withmilk_km,morning_withoutmilk_km,evening_withmilk_km,evening_withoutmilk_km,route_code,vehicle_master_code,wef_date,parsing_no",
+    "join": [
+      {
+        "table": "vehicle_master",
+        "condition": "vehicle_master.vehicle_code=route_other_info_for_km.vehicle_master_code"
+      }
+    ],
+    "where_data": "route_code"
+  },
+  "route_other_info_for_time": {
+    "fields": "route_other_info_time_code,morning_start_time,morning_end_time,morning_grace_time,evening_start_time,evening_end_time,evening_grace_time,wef_date",
+    "where_data": "route_code"
+  },
+  "business_hierarchy": {
+    "fields": "mpp_code,plant_code,bmc_code",
+    "where_data": "route_code"
+  },
+  //Configuration
+  "shift": {
+    "fields": "shift_code,shift_name,shift_short_name,shift_at,is_active"
+  },
+  "milk_quality_param": {
+    "fields": "milk_quality_param_code,param,rate_chart,is_collection"
+  },
+  "milk_quality_type": {
+    "fields": "milk_quality_type_code,milk_quality_type_name,is_active"
+  },
+  "milk_type": {
+    "fields": "milk_type_code,milk_type_name,milk_type_short_name,is_active"
+  },
+  "department": {
+    "fields": "department_code,department_name,is_active"
+  },
+  "bmc_silos_info": {
+    "fields": "silos_code,chilling_capacity,manufacturer_code,wef_date,model,storage_capacity,owning_type,module_code,module_name,is_default,bmc_silos_info.milk_type_code,bmc_type,milk_type.milk_type_name",
+    "join": [
+      {
+        "table": "milk_type",
+        "condition": "milk_type.milk_type_code=bmc_silos_info.milk_type_code"
+      }
+    ],
+    "where_data": "module_code,module_name"
+  },
+  "approval_stages": {
+    "fields": "approval_stages_code,approval_type,levels,status_code,status_type,approval_mode,approval_stages.department_code,department.department_name",
+    "join": [
+      {
+        "table": "department",
+        "condition": "approval_stages.department_code=department.department_code"
+      }
+    ]
+  }
+}

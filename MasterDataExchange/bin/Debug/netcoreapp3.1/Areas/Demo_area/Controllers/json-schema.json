@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "JSON Schema for my JSON file format",
+
+  "type": "object",
+  "required": ["mobile_no"],
+
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "mobile_no": {
+      "type": "string",
+      //  "maxLength": 10,
+     
+    },
+    "account_no": {
+      "$id": "#/Demo/Demo/validate",
+      "requires":true
+    }
+  }
+}

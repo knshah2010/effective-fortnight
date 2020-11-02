@@ -1,0 +1,48 @@
+{
+  "role_list": {
+    "table": "role",
+    "fields": "role_code,role_name,organisation_type,description",
+    "orderby": "role_code"
+  },
+
+  "permission_list": {
+    "table": "permission",
+    "fields": "permission_code,permission_name,organisation_type,description",
+    "orderby": "permission_code"
+  },
+
+  "actions_list": {
+    "table": "actions",
+    "fields": "action_code,action_name,action_url,description,menu_level",
+    "orderby": "action_code"
+  },
+
+  "user_actions": {
+    "table": "user_role as u",
+    //"fields": "u.user_code,a.action_code,a.action_name,a.portal_url,a.service_url,a.menu_level,a.description,a.is_active,a.is_free,a.parent_code",
+    "fields": "distinct a.portal_url",
+    "join": [
+      {
+        "table": "role_permission as rp",
+        "condition": "u.role_code=rp.role_code"
+      },
+      {
+        "table": "permission_action as pa",
+        "condition": "rp.permission_code=pa.permission_code and action_for=2"
+      },
+      {
+        "table": "actions as a",
+        "condition": "pa.action_code =a.action_code"
+      }
+    ],
+    "require": "u.user_code",
+    "where": [
+      {
+        "direct_condition": "(a.portal_url is not null AND a.portal_url <> '#' )",
+        "propertyvalue": "#$#",
+        "propertyname": "default"
+      }
+    ]
+  }
+
+}

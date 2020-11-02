@@ -1,0 +1,275 @@
+{
+  "bank": {
+    "table": "bank as bank",
+    "fields": "bank_code,bank_name,checked_ac_no,is_active,nationalized_bank,short_name,ac_no_length",
+    "require": "bank.bank_code"
+  },
+
+  "branch": {
+    "table": "branch as branch",
+    "fields": "branch.bank_code,bank.bank_name,branch.branch_code,branch.branch_name,branch.ifsc,branch.wef_date,branch.is_active",
+    "join": [
+      {
+        "table": "bank as bank",
+        "condition": "branch.bank_code=bank.bank_code"
+      }
+    ],
+    "require": "branch.branch_code"
+  },
+
+  "branch_ifsc": {
+    "table": "branch as branch",
+    "fields": "FORMATMESSAGE('%s_%s_%s',ifsc,case when bank.checked_ac_no = 1 then '1' else '0' end,bank.ac_no_length) as ifsc_check_length",
+    "join": [
+      {
+        "table": "bank as bank",
+        "condition": "branch.bank_code=bank.bank_code"
+      }
+    ],
+    "require": "bank.bank_code,branch.branch_code"
+  },
+
+  "company_group": {
+    "table": "company_group",
+    "fields": "company_group_code,company_group_name,company_group_ex_code,company_group_short_name",
+    "require": "company_group.company_group_code"
+  },
+
+  "company": {
+    "table": "company as company",
+    "fields": "company.company_group_code,company_code,company_name,company_ex_code,company_short_name",
+    "join": [
+      {
+        "table": "company_group as company_group",
+        "condition": "company_group.company_group_code=company.company_group_code"
+      }
+    ],
+    "require": "company.company_code"
+  },
+
+  "plant": {
+    "table": "plant as plant",
+    "fields": "plant.plant_code,plant.plant_name,plant.is_active,plant.plant_ex_code,company.company_code,company.company_name",
+    "join": [
+      {
+        "table": "business_hierarchy as b",
+        "condition": "b.plant_code=plant.plant_code and b.mcc_code is null and is_default='1'"
+      },
+      {
+        "table": "company as company",
+        "condition": "company.company_code=b.company_code"
+      }
+    ],
+    "require": "plant.plant_code"
+  },
+
+  "mcc": {
+    "table": "mcc as mcc",
+    "fields": "mcc.mcc_code,mcc.mcc_name,mcc.is_active,mcc.mcc_ex_code,mcc.description,company.company_code,company.company_name,plant.plant_code,plant.plant_name",
+    "join": [
+      {
+        "table": "business_hierarchy as b",
+        "condition": "b.mcc_code=mcc.mcc_code and b.bmc_code is null and is_default='1'"
+      },
+      {
+        "table": "company",
+        "condition": "company.company_code=b.company_code"
+      },
+      {
+        "table": "plant",
+        "condition": "plant.plant_code=b.plant_code"
+      }
+    ],
+    "require": "mcc.mcc_code"
+  },
+
+  "bmc": {
+    "table": "bmc as bmc",
+    "fields": "bmc.bmc_code,bmc.bmc_name,bmc.is_active,bmc.bmc_ex_code,bmc.description,company.company_code,company.company_name,plant.plant_code,plant.plant_name,mcc.mcc_code,mcc.mcc_name",
+    "join": [
+      {
+        "table": "business_hierarchy as b",
+        "condition": "b.bmc_code=bmc.bmc_code and (b.route_code is null or b.route_code=0) and is_default='1'"
+      },
+      {
+        "table": "company",
+        "condition": "company.company_code=b.company_code"
+      },
+      {
+        "table": "plant",
+        "condition": "plant.plant_code=b.plant_code"
+      },
+      {
+        "table": "mcc",
+        "condition": "mcc.mcc_code=b.mcc_code"
+      }
+    ],
+    "require": "bmc.bmc_code"
+  },
+
+  "mpp": {
+    "table": "mpp as mpp",
+    "fields": "mpp.mpp_code,mpp_ex_code,mpp_short_name,mpp.mpp_name,mpp.mpp_type,mpp.mpp_punch_line,search_hierarchy.company_code,company.company_name,plant_code,plant_name,mcc_code,mcc_name,bmc_code,bmc_name,route_code",
+    "join": [
+      {
+        "table": "search_hierarchy",
+        "condition": "search_hierarchy.mpp_code=mpp.mpp_code and is_default='1'"
+      },
+      {
+        "table": "company",
+        "condition": "company.company_code=search_hierarchy.company_code"
+      }
+
+    ],
+    "require": "mpp.mpp_code"
+  },
+
+  "collection_point": {
+    "table": "collection_point as collection_point",
+    "fields": "collection_point_code,is_active,collection_point.wef_date,search_hierarchy.mpp_code,mpp_name,company_code,plant_code,mcc_code,bmc_code",
+    "join": [
+
+      {
+        "table": "search_hierarchy",
+        "condition": "search_hierarchy.mpp_code=collection_point.mpp_code"
+      }
+    ],
+    "require": "collection_point.collection_point_code"
+  },
+
+  "sahayak": {
+    "table": "sahayak",
+    "fields": "sahayak.sahayak_code,sahayak.sahayak_surname,sahayak.sahayak_name,sahayak.sahayak_ex_code,b.plant_code,plant.plant_name,mcc.mcc_code,mcc.mcc_name,bmc.bmc_code,bmc.bmc_name,mpp.mpp_code,mpp.mpp_name,company.company_code,company.company_name",
+    "join": [
+      {
+        "table": "member_sahayak_hierarchy b",
+        "condition": "b.sahayak_code=sahayak.sahayak_code"
+      },
+      {
+        "table": "company",
+        "condition": "company.company_code=b.company_code"
+      },
+      {
+        "table": "plant",
+        "condition": "plant.plant_code=b.plant_code"
+      },
+      {
+        "table": "mcc",
+        "condition": "mcc.mcc_code=b.mcc_code"
+      },
+      {
+        "table": "bmc",
+        "condition": "bmc.bmc_code=b.bmc_code"
+      },
+      {
+        "table": "mpp",
+        "condition": "mpp.mpp_code=b.mpp_code"
+      }
+    ],
+    "require": "sahayak.sahayak_code"
+  },
+
+  "party_group": {
+    "table": "party_group",
+    "fields": "party_group_code,party_group_name",
+    "require": "party_group_code"
+  },
+
+  "party_master": {
+    "table": "party_master",
+    "fields": "party_master_code,party_master_type,party_name,description,party_master.is_active,party_group.party_group_code,party_group_name,company.company_code,company.company_name",
+    "join": [
+      {
+        "table": "party_group",
+        "condition": "party_group.party_group_code=party_master.party_group_code"
+      },
+      {
+        "table": "company",
+        "condition": "company.company_code=party_master.company_code"
+      }
+    ],
+    "require": "party_master_code"
+  },
+
+  "vehicle_master": {
+    "table": "vehicle_master as vehicle_master",
+    "fields": "vehicle_code,vehicle_type,parsing_no,capacity,applicable_rto,average,rc_book_no,vehicle_master.is_active,vehicle_master.party_master_code,party_master.party_name",
+    "join": [
+      {
+        "table": "party_master",
+        "condition": "party_master.party_master_code=vehicle_master.party_master_code"
+      }
+    ],
+    "require": "vehicle_code"
+  },
+
+  "vehicle_chamber": {
+    "table": "vehicle_master",
+    "fields": "no_of_chamber as no_of_chamber",
+    "require": "vehicle_code"
+  },
+
+  "vehicle_detail": {
+    "table": "vehicle_detail as vehicle_detail",
+    "fields": "vehicle_detail_code,vehicle_master_code,billing_type,insurance,pollution_certificate,rent,wef_date,vehicle_master.vehicle_code",
+    "join": [
+      {
+        "table": "vehicle_master",
+        "condition": "vehicle_master.vehicle_code=vehicle_detail.vehicle_master_code"
+      }
+    ],
+    "reqire": "vehicle_detail_code"
+  },
+
+  "route": {
+    "table": "route as route",
+    "fields": "route.route_code,route.route_name,route_type,route_ex_code,company_code,plant_code,mcc_code,bmc_code",
+    "join": [
+      {
+        "table": "business_hierarchy as hierarchy",
+        "condition": "hierarchy.route_code=route.route_code and is_default='1'"
+      }
+    ],
+    "require": "route.route_code"
+  },
+
+  "dpu_sim_registration": {
+    "table": "dpu_registration as dr",
+    "fields": "dpu_registration_code,search_hierarchy.company_code,search_hierarchy.plant_code,search_hierarchy.mcc_code,search_hierarchy.mcc_tr_code,search_hierarchy.bmc_code,search_hierarchy.bmc_tr_code,search_hierarchy.bmc_name,search_hierarchy.mpp_code,search_hierarchy.mpp_tr_code,search_hierarchy.mpp_name,mobile_no,service_provider,sim_issued_to,sim_no,imei_no,dpu_serial_no,dr.wef_date",
+    "join": [
+      {
+        "table": "business_hierarchy_view as search_hierarchy",
+        "condition": "dr.mpp_code=search_hierarchy.mpp_code and search_hierarchy.is_default=1"
+      }
+    ],
+    "require": "dr.dpu_registration_code"
+  },
+
+  "reil_dpu_configuration": {
+    "table": "reil_dpu_configuration as rdc",
+    "fields": "reil_dpu_configuration_code,search_hierarchy.company_code,search_hierarchy.company_name,search_hierarchy.plant_code,search_hierarchy.plant_name,search_hierarchy.mcc_code,search_hierarchy.mcc_tr_code,search_hierarchy.mcc_name,search_hierarchy.bmc_code,search_hierarchy.bmc_tr_code,search_hierarchy.bmc_name,search_hierarchy.mpp_code,search_hierarchy.mpp_tr_code,search_hierarchy.mpp_name,rdc.quantity_mode, CASE WHEN rdc.quantity_mode = 0 THEN 'Kg' ELSE 'Ltr' END As quantity_mode_name,rdc.mode_of_analyzer, CASE WHEN rdc.mode_of_analyzer = 0 THEN 'Auto/Manual' ELSE 'Auto' END AS mode_of_analyzer_name,rdc.mode_of_weigher, CASE WHEN rdc.mode_of_weigher = 0 THEN 'Auto/Manual' ELSE 'Auto' END AS mode_of_weigher_name,rdc.testing_equipment, CASE WHEN rdc.testing_equipment=0 THEN 'REIL UMA' ELSE 'EKO ULTRA' END AS testing_equipment_name,rdc.type_of_weigher,CASE WHEN rdc.type_of_weigher=0 THEN '200 Kg' ELSE '60 Kg' END AS type_of_weigher_name,rdc.start_fat_range_buf,rdc.max_fat,rdc.max_snf,rdc.failed_txn_dispatch,CASE WHEN rdc.failed_txn_dispatch=0 THEN 'Disable' ELSE 'Enable' END AS failed_txn_dispatch_name,rdc.no_of_day_failed_txn,rdc.collection_mode,CASE WHEN rdc.collection_mode=0 THEN 'Both' ELSE CASE WHEN rdc.collection_mode=1 THEN 'Online' ELSE 'Offline' END END AS collection_mode_name,rdc.wef_date",
+    "join": [
+      {
+        "table": "business_hierarchy_view as search_hierarchy",
+        "condition": "rdc.bmc_code=search_hierarchy.bmc_code and rdc.mpp_code=search_hierarchy.mpp_code and search_hierarchy.is_default=1"
+      }
+    ],
+    "require": "rdc.reil_dpu_configuration_code"
+  },
+
+
+  "sahayak_data": {
+    "table": "sahayak",
+    "fields": "top(1) sahayak.sahayak_code,sahayak_name",
+    "join": [
+      {
+        "table": "member_sahayak_hierarchy",
+        "condition": "sahayak.sahayak_code=member_sahayak_hierarchy.sahayak_code and is_default=1"
+      }
+    ],
+    "orderby": "member_sahayak_hierarchy.member_sahayak_hierarchy_code desc"
+
+
+
+  }
+}
