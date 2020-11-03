@@ -2,3 +2,6 @@
 MasterDataExchange/bin/*
 MasterDataExchange/obj/*
 MasterDataExchange/Properties/*
+Models/bin/*
+Models/obj/*
+DataExchangeApi.sln

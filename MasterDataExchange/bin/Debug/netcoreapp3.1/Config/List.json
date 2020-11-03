@@ -1,6 +1,0 @@
-{
-  "test": {
-    "Fields": "*",
-    "Table": "tbl_audit_module"
-  }
-}
