@@ -39,7 +39,8 @@ namespace Models
         public BmcValidator()
         {
             RuleFor(d => d.bmc_code).Require();
-            RuleFor(d => d.bmc_name).Require();            
+            RuleFor(d => d.bmc_name).Require();
+            RuleFor(d => d.is_active).Require();
         }
 
     }
