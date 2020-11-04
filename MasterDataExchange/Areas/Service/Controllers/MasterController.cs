@@ -1,6 +1,8 @@
-﻿using Framework.Controllers;
+﻿using DataExchange.Areas.Service.BAL;
+using Framework.Controllers;
 using Framework.Extension;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 
 namespace DataExchange.Areas.Service.Controllers
 {
@@ -12,9 +14,15 @@ namespace DataExchange.Areas.Service.Controllers
         [Route("bmc")]
         public IActionResult Bmc([FromBody]object data)
         {
-            ListEngine listEngine = new ListEngine();
-            SetParam();
-            return listEngine.List(data, FileName, "vlcc_shift_report");
+            MasterBal _bal = new MasterBal();
+            return _bal.SaveBmc(data.ParseRequestList<Bmc>());
+        }
+        [HttpPost]
+        [Route("route")]
+        public IActionResult Route([FromBody]object data)
+        {
+            MasterBal _bal = new MasterBal();
+            return _bal.SaveRoute(data.ParseRequestList<Route>());
         }
     }
 }
