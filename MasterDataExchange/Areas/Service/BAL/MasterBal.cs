@@ -30,12 +30,17 @@ namespace DataExchange.Areas.Service.BAL
                     if (NewModel == null)
                     {
                         BmcModel.mcc_plant_code = BmcModel.bmc_code;
+                        BmcModel.bmc_type_code = 2;
+                        BmcModel.bmc_milk_type = 1;
+                        BmcModel.manufacturer_code = 1;
                         Data.Add(new ModelParameter { SaveModel = BmcModel, ValidateModel = new BmcValidator() });
                     }
                     else
                     {
                         NewModel.bmc_name = BmcModel.bmc_name;
                         NewModel.is_active = BmcModel.is_active;
+                        NewModel.bmc_incharge_name = BmcModel.bmc_incharge_name;
+                        NewModel.contact_no = BmcModel.contact_no;
                         NewModel.model_operation = "update";
                         Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new BmcValidator() });
                     }
@@ -63,6 +68,8 @@ namespace DataExchange.Areas.Service.BAL
                     {
                         NewModel.route_name = RouteModel.route_name;
                         NewModel.is_active = RouteModel.is_active;
+                        NewModel.route_supervisor_name = RouteModel.route_supervisor_name;
+                        NewModel.contact_no = RouteModel.contact_no;
                         NewModel.model_operation = "update";
                         Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new RouteValidator() });
                     }
@@ -85,16 +92,109 @@ namespace DataExchange.Areas.Service.BAL
                     Dcs NewModel = NewRepo.FindByKey<Dcs>(DcsModel.dcs_code);
                     if (NewModel == null)
                     {
-                        Data.Add(new ModelParameter { SaveModel = DcsModel, ValidateModel = new RouteValidator() });
+                        DcsModel.destination_code = "0";
+                        DcsModel.destination_type = 0;
+                        DcsModel.is_bmc = 0;
+                        Data.Add(new ModelParameter { SaveModel = DcsModel, ValidateModel = new DcsValidator() });
                     }
                     else
                     {
                         NewModel.dcs_name = DcsModel.dcs_name;
                         NewModel.is_active = DcsModel.is_active;
+                        NewModel.dcs_incharge_name = DcsModel.dcs_incharge_name;
+                        NewModel.contact_no = DcsModel.contact_no;
                         NewModel.model_operation = "update";
-                        Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new RouteValidator() });
+                        Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new DcsValidator() });
                     }
                     SaveData(DcsModel.dcs_code);
+                }
+                else
+                {
+                    _response.Add(new CustomResponse { status = "300", msg = "error:dcs_code" });
+                }
+            }
+            return new CustomResult("success", _response);
+        }
+
+        public IActionResult SaveMember(List<Member> MemberList)
+        {
+            foreach (Member MemberModel in MemberList)
+            {
+                if (MemberModel.member_code != "")
+                {
+                    Member NewModel = NewRepo.FindByKey<Member>(MemberModel.member_code);
+                    if (NewModel == null)
+                    {
+                        Data.Add(new ModelParameter { SaveModel = MemberModel, ValidateModel = new MemberValidator() });
+                    }
+                    else
+                    {
+                        NewModel.member_name = MemberModel.member_name;
+                        NewModel.is_active = MemberModel.is_active;
+                        NewModel.mobile_no = MemberModel.mobile_no;
+                        NewModel.model_operation = "update";
+                        Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new MemberValidator() });
+                    }
+                    SaveData(MemberModel.member_code);
+                }
+                else
+                {
+                    _response.Add(new CustomResponse { status = "300", msg = "error:dcs_code" });
+                }
+            }
+            return new CustomResult("success", _response);
+        }
+
+        public IActionResult SaveCustomer(List<CustomerMaster> CustomerMasterList)
+        {
+            foreach (CustomerMaster CustomerMasterModel in CustomerMasterList)
+            {
+                if (CustomerMasterModel.customer_code != "")
+                {
+                    CustomerMaster NewModel = NewRepo.FindByKey<CustomerMaster>(CustomerMasterModel.customer_code);
+                    if (NewModel == null)
+                    {
+                        Data.Add(new ModelParameter { SaveModel = CustomerMasterModel, ValidateModel = new CustomerMasterValidator() });
+                    }
+                    else
+                    {
+                        NewModel.customer_name = CustomerMasterModel.customer_name;
+                        NewModel.is_active = CustomerMasterModel.is_active;
+                        NewModel.mobile_no = CustomerMasterModel.mobile_no;
+                        NewModel.model_operation = "update";
+                        Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new CustomerMasterValidator() });
+                    }
+                    SaveData(CustomerMasterModel.customer_code);
+                }
+                else
+                {
+                    _response.Add(new CustomResponse { status = "300", msg = "error:dcs_code" });
+                }
+            }
+            return new CustomResult("success", _response);
+        }
+
+        public IActionResult SaveVehicle(List<VehicleMaster> VehicleMasterList)
+        {
+            foreach (VehicleMaster VehicleMasterModel in VehicleMasterList)
+            {
+                if (VehicleMasterModel.vehicle_code != "")
+                {
+                    VehicleMaster NewModel = NewRepo.FindByKey<VehicleMaster>(VehicleMasterModel.vehicle_code);
+                    if (NewModel == null)
+                    {
+                        Data.Add(new ModelParameter { SaveModel = VehicleMasterModel, ValidateModel = new VehicleMasterValidator() });
+                    }
+                    else
+                    {
+                        NewModel.driver_name = VehicleMasterModel.driver_name;
+                        NewModel.is_active = VehicleMasterModel.is_active;
+                        NewModel.driver_contact_no = VehicleMasterModel.driver_contact_no;
+                        NewModel.driving_license_number = VehicleMasterModel.driving_license_number;
+                        NewModel.model_operation = "update";
+                        Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new VehicleMasterValidator() });
+                    }
+                    SaveData(VehicleMasterModel.vehicle_code);
                 }
                 else
                 {

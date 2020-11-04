@@ -24,6 +24,8 @@ namespace Models
         public DateTime wef_date { get; set; }
         public bool is_active { get; set; }
         public bool is_delete { get; set; }
+        [Computed]
+        public new string flg_sentbox_entry { get; set; } = "N";
     }
 
     public class DcsPurchaseRateValidator : AbstractValidator<DcsPurchaseRate>

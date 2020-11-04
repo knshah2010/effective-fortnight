@@ -28,6 +28,8 @@ namespace Models
         public int quality_param_code { get; set; }
         public int rate_type { get; set; }
         public string formula { get; set; }
+        [Computed]
+        public new string flg_sentbox_entry { get; set; } = "N";
     }
 
     public class DcsPurchaseRateBasedValidator : AbstractValidator<DcsPurchaseRateBased>

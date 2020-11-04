@@ -41,6 +41,8 @@ namespace Models
         public string x_col5 { get; set; }
         public int capacity { get; set; }
         public string billing_method { get; set; }
+        [Computed]
+        public new string flg_sentbox_entry { get; set; } = "N";
     }
 
     public class VehicleMasterValidator : AbstractValidator<VehicleMaster>

@@ -24,5 +24,37 @@ namespace DataExchange.Areas.Service.Controllers
             MasterBal _bal = new MasterBal();
             return _bal.SaveRoute(data.ParseRequestList<Route>());
         }
+
+        [HttpPost]
+        [Route("dcs")]
+        public IActionResult Dcs([FromBody] object data)
+        {
+            MasterBal _bal = new MasterBal();
+            return _bal.SaveMpp(data.ParseRequestList<Dcs>());
+        }
+
+        [HttpPost]
+        [Route("member")]
+        public IActionResult Member([FromBody] object data)
+        {
+            MasterBal _bal = new MasterBal();
+            return _bal.SaveMember(data.ParseRequestList<Member>());
+        }
+
+        [HttpPost]
+        [Route("customer")]
+        public IActionResult Customer([FromBody] object data)
+        {
+            MasterBal _bal = new MasterBal();
+            return _bal.SaveCustomer(data.ParseRequestList<CustomerMaster>());
+        }
+
+        [HttpPost]
+        [Route("vehicle")]
+        public IActionResult Vehicle([FromBody] object data)
+        {
+            MasterBal _bal = new MasterBal();
+            return _bal.SaveVehicle(data.ParseRequestList<VehicleMaster>());
+        }
     }
 }

@@ -20,7 +20,8 @@ namespace Models
         public int milk_type_code { get; set; }
         public string purchase_rate_code { get; set; }
         public int rate_type_code { get; set; }
-
+        [Computed]
+        public new string flg_sentbox_entry { get; set; } = "N";
     }
 
     public class DcsPurchaseRateDetailsValidator : AbstractValidator<DcsPurchaseRateDetails>

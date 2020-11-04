@@ -11,6 +11,8 @@ namespace Models
         [ExplicitKey]
         public int vehicle_type_code { get; set; }
         public string vehicle_type_name { get; set; }
+        [Computed]
+        public new string flg_sentbox_entry { get; set; } = "N";
     }
 
     public class VehicleTypeValidator : AbstractValidator<VehicleType>
