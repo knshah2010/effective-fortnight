@@ -31,6 +31,9 @@ namespace Models
         public string x_col3 { get; set; }
         public string x_col4 { get; set; }
         public string x_col5 { get; set; }
+        public string bmc_incharge_name { get; set; }
+        public string contact_no { get; set; }
+
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
     }
