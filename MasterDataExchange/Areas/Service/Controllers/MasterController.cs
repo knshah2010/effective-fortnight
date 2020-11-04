@@ -4,8 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DataExchange.Areas.Service.Controllers
 {
-    [Area("Service")]
-    [ApiVersion("1.0")]
+    [Area("Service")]   
     [Route("{v:apiVersion}/Service/[controller]")]
     public class MasterController : BaseController
     {
