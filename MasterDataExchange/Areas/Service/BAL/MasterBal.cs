@@ -19,9 +19,9 @@ namespace DataExchange.Areas.Service.BAL
             Data = new List<ModelParameter>();
             _response = new List<CustomResponse>();
         }
+
         public IActionResult SaveBmc(List<Bmc> BmcList)
         {
-
             foreach (Bmc BmcModel in BmcList)
             {
                 if (BmcModel.bmc_code != "")
@@ -29,10 +29,43 @@ namespace DataExchange.Areas.Service.BAL
                     Bmc NewModel = NewRepo.FindByKey<Bmc>(BmcModel.bmc_code);
                     if (NewModel == null)
                     {
-                        BmcModel.mcc_plant_code = BmcModel.bmc_code;
-                        BmcModel.ref_code = BmcModel.bmc_code;
+                        QueryParam Query = new QueryParam
+                        {
+                            Fields = "*",
+                            Table = "tbl_unions",
+                            Where = new List<ConditionParameter>
+                        {
+                           Condition("union_code","1")
+                        }
+                        };
+                        Unions UnionsModel = NewRepo.Find<Unions>(Query);
+                        if (UnionsModel.has_bmc == true && UnionsModel.has_mcc == false)
+                        {
+                            BmcModel.mcc_plant_code = BmcModel.bmc_code;
+                            BmcModel.ref_code = BmcModel.bmc_code;
+                            BmcModel.union_code = UnionsModel.union_code;
+                            BmcModel.originating_org_code = UnionsModel.union_code;
 
-                        Data.Add(new ModelParameter { SaveModel = BmcModel, ValidateModel = new BmcValidator() });
+                            MccPlant MccPlantModel = new MccPlant();
+                            MccPlantModel.mcc_plant_code = BmcModel.bmc_code;
+                            MccPlantModel.name = BmcModel.bmc_name;
+                            MccPlantModel.union_code = BmcModel.union_code;
+                            MccPlantModel.ref_code = BmcModel.bmc_code;
+                            MccPlantModel.contact_person = BmcModel.bmc_incharge_name;
+                            MccPlantModel.mobile_no = BmcModel.contact_no;
+                            MccPlantModel.originating_org_code = BmcModel.originating_org_code;
+
+                            Data.Add(new ModelParameter { SaveModel = BmcModel, ValidateModel = new BmcValidator() });
+                            Data.Add(new ModelParameter { SaveModel = MccPlantModel, ValidateModel = new MccPlantValidator() });
+                        }
+                        else
+                        {
+                            BmcModel.mcc_plant_code = BmcModel.bmc_code;
+                            BmcModel.ref_code = BmcModel.bmc_code;
+                            BmcModel.union_code = UnionsModel.union_code;
+
+                            Data.Add(new ModelParameter { SaveModel = BmcModel, ValidateModel = new BmcValidator() });
+                        }
                     }
                     else
                     {
@@ -61,6 +94,18 @@ namespace DataExchange.Areas.Service.BAL
                     Route NewModel = NewRepo.FindByKey<Route>(RouteModel.route_code);
                     if (NewModel == null)
                     {
+                        QueryParam Query = new QueryParam
+                        {
+                            Fields = "*",
+                            Table = "tbl_unions",
+                            Where = new List<ConditionParameter>
+                        {
+                           Condition("union_code","1")
+                        }
+                        };
+                        Unions UnionsModel = NewRepo.Find<Unions>(Query);
+
+
                         if (RouteModel.route_type == null || RouteModel.route_type == "")
                         {
                             RouteModel.route_type = "Can";
@@ -73,6 +118,10 @@ namespace DataExchange.Areas.Service.BAL
                             RouteModel.vehicle_type_code = 2;
 
                         RouteModel.ref_code = RouteModel.route_code;
+                        RouteModel.union_code = UnionsModel.union_code;
+                        RouteModel.originating_org_code = UnionsModel.union_code;
+                        RouteModel.is_active = true;
+
                         Data.Add(new ModelParameter { SaveModel = RouteModel, ValidateModel = new RouteValidator() });
                     }
                     else
@@ -100,6 +149,17 @@ namespace DataExchange.Areas.Service.BAL
             {
                 if (DcsModel.dcs_code != "")
                 {
+                    QueryParam Query = new QueryParam
+                    {
+                        Fields = "*",
+                        Table = "tbl_unions",
+                        Where = new List<ConditionParameter>
+                        {
+                           Condition("union_code","1")
+                        }
+                    };
+                    Unions UnionsModel = NewRepo.Find<Unions>(Query);
+
                     Dcs NewModel = NewRepo.FindByKey<Dcs>(DcsModel.dcs_code);
                     if (NewModel == null)
                     {
@@ -113,6 +173,8 @@ namespace DataExchange.Areas.Service.BAL
                             DcsModel.x_col1 = "0#0";
 
                         DcsModel.ref_code = DcsModel.dcs_code.PadLeft(15,'0');
+                        DcsModel.originating_org_code = UnionsModel.union_code;
+
                         Data.Add(new ModelParameter { SaveModel = DcsModel, ValidateModel = new DcsValidator() });
                     }
                     else
@@ -140,9 +202,23 @@ namespace DataExchange.Areas.Service.BAL
             {
                 if (MemberModel.member_code != "")
                 {
+
+                    QueryParam Query = new QueryParam
+                    {
+                        Fields = "*",
+                        Table = "tbl_unions",
+                        Where = new List<ConditionParameter>
+                        {
+                           Condition("union_code","1")
+                        }
+                    };
+                    Unions UnionsModel = NewRepo.Find<Unions>(Query);
+
                     Member NewModel = NewRepo.FindByKey<Member>(MemberModel.member_code);
                     if (NewModel == null)
                     {
+                        MemberModel.originating_org_code = UnionsModel.union_code;
+
                         Data.Add(new ModelParameter { SaveModel = MemberModel, ValidateModel = new MemberValidator() });
                     }
                     else
@@ -169,10 +245,23 @@ namespace DataExchange.Areas.Service.BAL
             {
                 if (CustomerMasterModel.customer_code != "")
                 {
+                    QueryParam Query = new QueryParam
+                    {
+                        Fields = "*",
+                        Table = "tbl_unions",
+                        Where = new List<ConditionParameter>
+                        {
+                           Condition("union_code","1")
+                        }
+                    };
+                    Unions UnionsModel = NewRepo.Find<Unions>(Query);
+
+
                     CustomerMaster NewModel = NewRepo.FindByKey<CustomerMaster>(CustomerMasterModel.customer_code);
                     if (NewModel == null)
                     {
                         CustomerMasterModel.ref_code = CustomerMasterModel.customer_code;
+                        CustomerMasterModel.originating_org_code = UnionsModel.union_code;
                         Data.Add(new ModelParameter { SaveModel = CustomerMasterModel, ValidateModel = new CustomerMasterValidator() });
                     }
                     else
@@ -199,9 +288,22 @@ namespace DataExchange.Areas.Service.BAL
             {
                 if (VehicleMasterModel.vehicle_code != "")
                 {
+                    QueryParam Query = new QueryParam
+                    {
+                        Fields = "*",
+                        Table = "tbl_unions",
+                        Where = new List<ConditionParameter>
+                        {
+                           Condition("union_code","1")
+                        }
+                    };
+                    Unions UnionsModel = NewRepo.Find<Unions>(Query);
+
                     VehicleMaster NewModel = NewRepo.FindByKey<VehicleMaster>(VehicleMasterModel.vehicle_code);
                     if (NewModel == null)
                     {
+
+                        VehicleMasterModel.originating_org_code = UnionsModel.union_code;
                         Data.Add(new ModelParameter { SaveModel = VehicleMasterModel, ValidateModel = new VehicleMasterValidator() });
                     }
                     else

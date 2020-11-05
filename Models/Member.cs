@@ -17,7 +17,7 @@ namespace Models
         public string member_name { get; set; }
         public string surname { get; set; }
         public int animal_type_code { get; set; }
-        public string gender_code { get; set; }
+        public string gender_code { get; set; } = "0";
         public string mobile_no { get; set; }
         public string email { get; set; }
         public string adhar_no { get; set; }

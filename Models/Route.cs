@@ -18,7 +18,7 @@ namespace Models
         public string ref_code { get; set; }
         public string to_dest { get; set; }
         public string to_type { get; set; }
-        public int capacity { get; set; } = 0;
+        public int capacity { get; set; } = 1;
         public string route_type { get; set; }
         public float route_length_kms { get; set; } 
         public string morning_start_time { get; set; }
