@@ -1,6 +1,7 @@
 ﻿using DataExchange.Areas.Service.BAL;
 using Framework.Controllers;
 using Framework.Extension;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
@@ -55,6 +56,14 @@ namespace DataExchange.Areas.Service.Controllers
         {
             MasterBal _bal = new MasterBal();
             return _bal.SaveVehicle(data.ParseRequestList<VehicleMaster>());
+        }
+
+        [HttpPost]
+        [Route("upload")]
+        public IActionResult Create([FromForm] IFormFile File, [FromForm] string process_name)
+        {
+            MasterBal _bal = new MasterBal();
+            return _bal.Upload(File, process_name);
         }
     }
 }

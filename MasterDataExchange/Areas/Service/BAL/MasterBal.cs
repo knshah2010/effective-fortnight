@@ -2,15 +2,21 @@
 using Framework.BAL;
 using Framework.CustomDataType;
 using Framework.Extension;
+using Framework.Library.Helper;
 using Framework.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace DataExchange.Areas.Service.BAL
 {
     public class MasterBal : BaseBal<BaseModel>
     {
+        private string _NewFileName;
+        private IFormFile _File;
         private List<ModelParameter> Data;
         private List<CustomResponse> _response;
         private string result = "";
@@ -338,7 +344,37 @@ namespace DataExchange.Areas.Service.BAL
             }
         }
 
+        public IActionResult Upload(IFormFile File, string process_name)
+        {
+            ImportFile ImportFileModel = new ImportFile();
 
+
+            _File = File;
+
+            string DirectoryPath = FileHelper.FileServerPath();
+            FileHelper.CreateDirectory(DirectoryPath);
+            _NewFileName = FileHelper.NewFileName(DirectoryPath, process_name);
+
+
+            ImportFileModel.file_name = File.FileName;
+            ImportFileModel.process_name = process_name;
+            ImportFileModel.file_path = _NewFileName;
+
+            Data = new List<ModelParameter>
+                {
+                new ModelParameter { ValidateModel = new ImportFileValidator(), SaveModel = ImportFileModel }
+                };
+
+            using (var fileStream = new FileStream(_NewFileName, FileMode.Create))
+            {
+                _File.CopyTo(fileStream);
+                SaveData(Data);
+            }
+
+
+
+            return new CustomResult("success");
+        }
 
     }
 }
