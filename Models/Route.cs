@@ -4,6 +4,7 @@ using FluentValidation;
 using Framework.Library.Validator;
 using System;
 using Framework.Library.Helper;
+using System.Collections.Generic;
 
 namespace Models
 {
@@ -37,6 +38,7 @@ namespace Models
 
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
+        public string originating_org_type { get; set; } = "portal";
     }
     public class RouteValidator : AbstractValidator<Route>
     {
@@ -44,6 +46,10 @@ namespace Models
         {
             RuleFor(d => d.route_code).Require();
             RuleFor(d => d.route_name).Require();
+
+            List<string> route_type_condition = new List<string> { "Can", "Tanker"};
+            RuleFor(d => d.route_type).Must(d => route_type_condition.Contains(d))
+                    .WithMessage("Please only use: " + String.Join(",", route_type_condition));
         }
 
     }

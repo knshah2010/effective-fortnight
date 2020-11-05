@@ -30,6 +30,7 @@ namespace Models
         public string formula { get; set; }
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
+        public string originating_org_type { get; set; } = "portal";
     }
 
     public class DcsPurchaseRateBasedValidator : AbstractValidator<DcsPurchaseRateBased>

@@ -27,6 +27,7 @@ namespace Models
         public bool is_active { get; set; }
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
+        public string originating_org_type { get; set; } = "portal";
     }
 
     public class DcsPurchaseRateApplicabilityValidator : AbstractValidator<DcsPurchaseRateApplicability>

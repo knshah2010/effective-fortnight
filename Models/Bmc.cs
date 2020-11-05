@@ -36,6 +36,7 @@ namespace Models
 
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
+        public string originating_org_type { get; set; } = "portal";
     }
     public class BmcValidator : AbstractValidator<Bmc>
     {

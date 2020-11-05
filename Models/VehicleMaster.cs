@@ -26,11 +26,11 @@ namespace Models
         public bool insurance { get; set; }
         public string rc_book_no { get; set; }
         public DateTime expiry_date { get; set; }
-        public BigInteger rent { get; set; }
+        public int rent { get; set; }
         public string average { get; set; }
         public string union_code { get; set; }
         public bool is_active { get; set; }
-        public BigInteger bmc_fuel_type_codecode { get; set; }
+        public int fuel_type_code{ get; set; }
         public string parsing_no { get; set; }
         public DateTime licence_expiry_date { get; set; }
         public string bmc_code { get; set; }
@@ -43,6 +43,7 @@ namespace Models
         public string billing_method { get; set; }
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
+        public string originating_org_type { get; set; } = "portal";
     }
 
     public class VehicleMasterValidator : AbstractValidator<VehicleMaster>

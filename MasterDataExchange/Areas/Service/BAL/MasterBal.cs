@@ -30,6 +30,7 @@ namespace DataExchange.Areas.Service.BAL
                     if (NewModel == null)
                     {
                         BmcModel.mcc_plant_code = BmcModel.bmc_code;
+                        BmcModel.ref_code = BmcModel.bmc_code;
                         BmcModel.bmc_type_code = 2;
                         BmcModel.bmc_milk_type = 1;
                         BmcModel.manufacturer_code = 1;
@@ -62,6 +63,18 @@ namespace DataExchange.Areas.Service.BAL
                     Route NewModel = NewRepo.FindByKey<Route>(RouteModel.route_code);
                     if (NewModel == null)
                     {
+                        if (RouteModel.route_type == null || RouteModel.route_type == "")
+                        {
+                            RouteModel.route_type = "Can";
+                            RouteModel.vehicle_type_code = 1;
+                        }
+
+                        if(RouteModel.route_type=="Can")
+                            RouteModel.vehicle_type_code = 1;
+                        else
+                            RouteModel.vehicle_type_code = 2;
+
+                        RouteModel.ref_code = RouteModel.route_code;
                         Data.Add(new ModelParameter { SaveModel = RouteModel, ValidateModel = new RouteValidator() });
                     }
                     else
@@ -92,6 +105,7 @@ namespace DataExchange.Areas.Service.BAL
                     Dcs NewModel = NewRepo.FindByKey<Dcs>(DcsModel.dcs_code);
                     if (NewModel == null)
                     {
+                        DcsModel.ref_code = DcsModel.dcs_code;
                         DcsModel.destination_code = "0";
                         DcsModel.destination_type = 0;
                         DcsModel.is_bmc = 0;
@@ -101,8 +115,8 @@ namespace DataExchange.Areas.Service.BAL
                     {
                         NewModel.dcs_name = DcsModel.dcs_name;
                         NewModel.is_active = DcsModel.is_active;
-                        NewModel.dcs_incharge_name = DcsModel.dcs_incharge_name;
-                        NewModel.contact_no = DcsModel.contact_no;
+                        NewModel.contact_person = DcsModel.contact_person;
+                        NewModel.mobile_no = DcsModel.mobile_no;
                         NewModel.model_operation = "update";
                         Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new DcsValidator() });
                     }
@@ -154,6 +168,7 @@ namespace DataExchange.Areas.Service.BAL
                     CustomerMaster NewModel = NewRepo.FindByKey<CustomerMaster>(CustomerMasterModel.customer_code);
                     if (NewModel == null)
                     {
+                        CustomerMasterModel.ref_code = CustomerMasterModel.customer_code;
                         Data.Add(new ModelParameter { SaveModel = CustomerMasterModel, ValidateModel = new CustomerMasterValidator() });
                     }
                     else
