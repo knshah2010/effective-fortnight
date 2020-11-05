@@ -32,7 +32,7 @@ namespace Models
         public string x_col3 { get; set; }
         public string x_col4 { get; set; }
         public string x_col5 { get; set; }
-        public bool is_active { get; set; }
+        public bool is_active { get; set; } = true;
         public string route_supervisor_name { get; set; }
         public string contact_no { get; set; }
 

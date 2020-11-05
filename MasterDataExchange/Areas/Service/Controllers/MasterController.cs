@@ -49,14 +49,7 @@ namespace DataExchange.Areas.Service.Controllers
             MasterBal _bal = new MasterBal();
             return _bal.SaveCustomer(data.ParseRequestList<CustomerMaster>());
         }
-
-        [HttpPost]
-        [Route("vehicle")]
-        public IActionResult Vehicle([FromBody] object data)
-        {
-            MasterBal _bal = new MasterBal();
-            return _bal.SaveVehicle(data.ParseRequestList<VehicleMaster>());
-        }
+              
 
         [HttpPost]
         [Route("upload")]

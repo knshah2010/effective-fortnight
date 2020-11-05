@@ -24,7 +24,7 @@ namespace Models
         public DateTime valid_from { get; set; }
         public string union_code { get; set; }
         public bool is_plant { get; set; }
-        public bool is_active { get; set; }
+        public bool is_active { get; set; } = true;
         public string x_col1 { get; set; }
         public string x_col2 { get; set; }
         public string x_col3 { get; set; }

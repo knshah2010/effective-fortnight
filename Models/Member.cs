@@ -26,7 +26,7 @@ namespace Models
         public string ifsc { get; set; }
         public string dcs_code { get; set; }
         public string rate_class { get; set; }
-        public bool is_active { get; set; }
+        public bool is_active { get; set; } = true;
         public string x_col1 { get; set; }
         public string x_col2 { get; set; }
         public string x_col3 { get; set; }

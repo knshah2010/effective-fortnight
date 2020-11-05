@@ -32,7 +32,7 @@ namespace Models
         public string plant_code { get; set; }
         public string mcc_plant_code { get; set; }
         public string bmc_code { get; set; }
-        public bool is_active { get; set; }
+        public bool is_active { get; set; } = true;
         public string x_col1 { get; set; }
         public string x_col2 { get; set; }
         public string x_col3 { get; set; }

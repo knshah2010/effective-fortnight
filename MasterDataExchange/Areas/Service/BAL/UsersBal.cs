@@ -18,8 +18,7 @@ namespace DataExchange.Areas.Service.BAL
     public class UsersBal : BaseBal<BaseModel>
     {
         private List<ModelParameter> Data;
-        private Users _user;
-        private QueryParam _query;
+        private Users _user;        
         private QueryParam Query;
         CacheRepository _cache;
 

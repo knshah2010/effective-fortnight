@@ -25,7 +25,7 @@ namespace Models
         public int bmc_milk_type { get; set; } = 1;
         public int manufacturer_code { get; set; } = 1;
         public bool is_mcc { get; set; }
-        public bool is_active { get; set; }
+        public bool is_active { get; set; } = true;
         public string x_col1 { get; set; }
         public string x_col2 { get; set; }
         public string x_col3 { get; set; }

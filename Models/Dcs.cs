@@ -21,7 +21,7 @@ namespace Models
         public int destination_type { get; set; } = 0;
         public string email { get; set; }
         public string ifsc { get; set; }
-        public bool is_active { get; set; }
+        public bool is_active { get; set; } = true;
         public int is_bmc { get; set; } = 0;
         public string mobile_no { get; set; }
         public string pan_no { get; set; }
