@@ -31,9 +31,7 @@ namespace DataExchange.Areas.Service.BAL
                     {
                         BmcModel.mcc_plant_code = BmcModel.bmc_code;
                         BmcModel.ref_code = BmcModel.bmc_code;
-                        BmcModel.bmc_type_code = 2;
-                        BmcModel.bmc_milk_type = 1;
-                        BmcModel.manufacturer_code = 1;
+
                         Data.Add(new ModelParameter { SaveModel = BmcModel, ValidateModel = new BmcValidator() });
                     }
                     else
@@ -105,10 +103,16 @@ namespace DataExchange.Areas.Service.BAL
                     Dcs NewModel = NewRepo.FindByKey<Dcs>(DcsModel.dcs_code);
                     if (NewModel == null)
                     {
-                        DcsModel.ref_code = DcsModel.dcs_code;
-                        DcsModel.destination_code = "0";
-                        DcsModel.destination_type = 0;
-                        DcsModel.is_bmc = 0;
+                        if (DcsModel.allow_multiple_milktype == 1)
+                            DcsModel.x_col1 = "1#1";
+                        else if (DcsModel.allow_multiple_milktype == 2)
+                            DcsModel.x_col1 = "0#1";
+                        else if (DcsModel.allow_multiple_milktype == 3)
+                            DcsModel.x_col1 = "1#0";
+                        else if (DcsModel.allow_multiple_milktype == 4)
+                            DcsModel.x_col1 = "0#0";
+
+                        DcsModel.ref_code = DcsModel.dcs_code.PadLeft(15,'0');
                         Data.Add(new ModelParameter { SaveModel = DcsModel, ValidateModel = new DcsValidator() });
                     }
                     else

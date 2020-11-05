@@ -21,9 +21,9 @@ namespace Models
         public int capacity { get; set; } = 0;
         public DateTime valid_from { get; set; } = DateHelper.CurrentDate();
         public string union_code { get; set; }
-        public int bmc_type_code { get; set; }
-        public int bmc_milk_type { get; set; }
-        public int manufacturer_code { get; set; }
+        public int bmc_type_code { get; set; } = 2;
+        public int bmc_milk_type { get; set; } = 1;
+        public int manufacturer_code { get; set; } = 1;
         public bool is_mcc { get; set; }
         public bool is_active { get; set; }
         public string x_col1 { get; set; }
