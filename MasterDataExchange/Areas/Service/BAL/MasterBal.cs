@@ -29,6 +29,8 @@ namespace DataExchange.Areas.Service.BAL
         public IActionResult SaveBmc(List<Bmc> BmcList)
         {
             Unions UnionsModel = GetUnion();
+            Plant PlantModel = GetPlant();
+            MccPlant MccModel = GetMccPlant();
             foreach (Bmc BmcModel in BmcList)
             {
                 if (BmcModel.bmc_code != "")
@@ -39,11 +41,13 @@ namespace DataExchange.Areas.Service.BAL
                         BmcModel.ref_code = BmcModel.bmc_code;
                         BmcModel.union_code = UnionsModel.union_code;
                         BmcModel.originating_org_code = UnionsModel.union_code;
+                        BmcModel.plant_code = PlantModel.plant_code;
                         if (UnionsModel.has_bmc == true && UnionsModel.has_mcc == false)
                         {
                             BmcModel.mcc_plant_code = BmcModel.bmc_code; 
                             MccPlant MccPlantModel = new MccPlant();
                             MccPlantModel.mcc_plant_code = BmcModel.bmc_code;
+                            MccPlantModel.plant_code = PlantModel.plant_code;
                             MccPlantModel.name = BmcModel.bmc_name;
                             MccPlantModel.union_code = MccPlantModel.originating_org_code = BmcModel.union_code;
                             MccPlantModel.ref_code = BmcModel.bmc_code;
@@ -53,12 +57,29 @@ namespace DataExchange.Areas.Service.BAL
                         }
                         else
                         {
-                            BmcModel.mcc_plant_code = BmcModel.bmc_code;  
+                            BmcModel.mcc_plant_code = MccModel.mcc_plant_code;
                         }
                         Data.Add(new ModelParameter { SaveModel = BmcModel, ValidateModel = new BmcValidator() });
                     }
                     else
                     {
+                        if (UnionsModel.has_bmc == true && UnionsModel.has_mcc == false)
+                        {
+                            NewModel.mcc_plant_code = BmcModel.bmc_code; 
+                            MccPlant MccPlantModel = new MccPlant();
+                            MccPlantModel.mcc_plant_code = BmcModel.bmc_code;
+                            MccPlantModel.plant_code = PlantModel.plant_code;
+                            MccPlantModel.name = BmcModel.bmc_name;
+                            MccPlantModel.union_code = MccPlantModel.originating_org_code = BmcModel.union_code;
+                            MccPlantModel.ref_code = BmcModel.bmc_code;
+                            MccPlantModel.contact_person = BmcModel.bmc_incharge_name;
+                            MccPlantModel.mobile_no = BmcModel.contact_no;                            
+                            Data.Add(new ModelParameter { SaveModel = MccPlantModel, ValidateModel = new MccPlantValidator() });
+                        }
+                        else
+                        {
+                            NewModel.mcc_plant_code = MccModel.mcc_plant_code;
+                        }
                         NewModel.bmc_name = BmcModel.bmc_name;
                         NewModel.is_active = BmcModel.is_active;
                         NewModel.bmc_incharge_name = BmcModel.bmc_incharge_name;
@@ -101,6 +122,16 @@ namespace DataExchange.Areas.Service.BAL
                     }
                     else
                     {
+                        if (NewModel.route_type == null || NewModel.route_type == "")
+                        {
+                            NewModel.route_type = "Can";
+                        }
+
+                        if (NewModel.route_type == "Can")
+                            NewModel.vehicle_type_code = 1;
+                        else
+                            NewModel.vehicle_type_code = 2;
+
                         NewModel.route_name = RouteModel.route_name;
                         NewModel.is_active = RouteModel.is_active;
                         NewModel.route_supervisor_name = RouteModel.route_supervisor_name;
@@ -121,14 +152,21 @@ namespace DataExchange.Areas.Service.BAL
         public IActionResult SaveMpp(List<Dcs> DcsList)
         {
             Unions UnionsModel = GetUnion();
+            Plant Plantmodel = GetPlant();
+            MccPlant MccPlantModel = GetMccPlant();
+            Bmc BmcModel = GetBmc();
             foreach (Dcs DcsModel in DcsList)
             {
                 if (DcsModel.dcs_code != "")
-                {                  
-
+                {
                     Dcs NewModel = NewRepo.FindByKey<Dcs>(DcsModel.dcs_code);
                     if (NewModel == null)
                     {
+                        if (UnionsModel.has_mcc == true)
+                            DcsModel.mcc_plant_code = MccPlantModel.mcc_plant_code;
+                        else
+                            DcsModel.mcc_plant_code = BmcModel.bmc_code;
+
                         if (DcsModel.allow_multiple_milktype == 1)
                             DcsModel.x_col1 = "1#1";
                         else if (DcsModel.allow_multiple_milktype == 2)
@@ -140,15 +178,28 @@ namespace DataExchange.Areas.Service.BAL
 
                         DcsModel.ref_code = DcsModel.dcs_code.PadLeft(15,'0');
                         DcsModel.originating_org_code =DcsModel.union_code= UnionsModel.union_code;
+                        DcsModel.plant_code = Plantmodel.plant_code;
+
                         Data.Add(new ModelParameter { SaveModel = DcsModel, ValidateModel = new DcsValidator() });
                     }
                     else
                     {
+                        if (DcsModel.allow_multiple_milktype == 1)
+                            NewModel.x_col1 = "1#1";
+                        else if (DcsModel.allow_multiple_milktype == 2)
+                            NewModel.x_col1 = "0#1";
+                        else if (DcsModel.allow_multiple_milktype == 3)
+                            NewModel.x_col1 = "1#0";
+                        else if (DcsModel.allow_multiple_milktype == 4)
+                            NewModel.x_col1 = "0#0";
+
                         NewModel.dcs_name = DcsModel.dcs_name;
                         NewModel.is_active = DcsModel.is_active;
                         NewModel.contact_person = DcsModel.contact_person;
                         NewModel.mobile_no = DcsModel.mobile_no;
                         NewModel.model_operation = "update";
+                        NewModel.plant_code = Plantmodel.plant_code;
+
                         Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new DcsValidator() });
                     }
                     SaveData(DcsModel.dcs_code);
@@ -164,6 +215,7 @@ namespace DataExchange.Areas.Service.BAL
         public IActionResult SaveMember(List<Member> MemberList)
         {
             Unions UnionsModel = GetUnion();
+
             foreach (Member MemberModel in MemberList)
             {
                 if (MemberModel.member_code != "")
@@ -211,6 +263,7 @@ namespace DataExchange.Areas.Service.BAL
                         NewModel.customer_name = CustomerMasterModel.customer_name;
                         NewModel.is_active = CustomerMasterModel.is_active;
                         NewModel.mobile_no = CustomerMasterModel.mobile_no;
+                        NewModel.customer_type = CustomerMasterModel.customer_type;
                         NewModel.model_operation = "update";
                         Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new CustomerMasterValidator() });
                     }
@@ -246,6 +299,36 @@ namespace DataExchange.Areas.Service.BAL
             return NewRepo.Find<Unions>(Query);
         }
 
+
+        private Plant GetPlant()
+        {
+            QueryParam Query = new QueryParam
+            {
+                Fields = "*",
+                Table = "tbl_plant",
+            };
+            return NewRepo.Find<Plant>(Query);
+        }
+
+        private MccPlant GetMccPlant()
+        {
+            QueryParam Query = new QueryParam
+            {
+                Fields = "*",
+                Table = "tbl_mcc_plant",
+            };
+            return NewRepo.Find<MccPlant>(Query);
+        }
+        private Bmc GetBmc()
+        {
+            QueryParam Query = new QueryParam
+            {
+                Fields = "*",
+                Table = "tbl_bmc",
+            };
+            return NewRepo.Find<Bmc>(Query);
+        }
+
         public IActionResult Upload(IFormFile File, string process_name)
         {
             ImportFile ImportFileModel = new ImportFile();
@@ -260,7 +343,7 @@ namespace DataExchange.Areas.Service.BAL
 
             ImportFileModel.file_name = File.FileName;
             ImportFileModel.process_name = process_name;
-            ImportFileModel.file_path = _NewFileName;
+            ImportFileModel.new_file_path = _NewFileName;
 
             Data = new List<ModelParameter>
                 {
@@ -272,7 +355,6 @@ namespace DataExchange.Areas.Service.BAL
                 _File.CopyTo(fileStream);
                 SaveData(Data);
             }
-
 
 
             return new CustomResult("success");

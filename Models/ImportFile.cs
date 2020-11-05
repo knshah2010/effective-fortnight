@@ -17,7 +17,7 @@ namespace Models
         public string operation_type { get; set; }
         public string process_name { get; set; }
         public string file_name { get; set; }
-        public string file_path { get; set; }
+        public string new_file_path { get; set; }
         public string error_file_path { get; set; }
         public int total_count { get; set; }
         /* 

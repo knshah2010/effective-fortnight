@@ -4,6 +4,7 @@ using FluentValidation;
 using Framework.Library.Validator;
 using System;
 using Framework.Library.Helper;
+using System.Collections.Generic;
 
 namespace Models
 {
@@ -50,6 +51,10 @@ namespace Models
         {
             RuleFor(d => d.customer_code).Require();
             RuleFor(d => d.customer_name).Require();
+
+            List<string> customer_type_condition = new List<string> { "1", "2", "3" };
+            RuleFor(d => d.customer_type).Must(d => customer_type_condition.Contains(d))
+                    .WithMessage("Please only use: " + String.Join(",", customer_type_condition));
         }
 
     }
