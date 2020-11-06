@@ -38,7 +38,10 @@ namespace Models
 
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
+        [Computed]
+        public string bmc_code { get; set; }
         public string originating_org_type { get; set; } = "portal";
+
     }
     public class RouteValidator : AbstractValidator<Route>
     {
@@ -46,6 +49,7 @@ namespace Models
         {
             RuleFor(d => d.route_code).Require();
             RuleFor(d => d.route_name).Require();
+            RuleFor(d => d.bmc_code).Require().CheckAvailable("tbl_bmc");
 
             List<string> route_type_condition = new List<string> { "Can", "Tanker"};
             RuleFor(d => d.route_type).Must(d => route_type_condition.Contains(d))

@@ -66,14 +66,15 @@ namespace DataExchange.Areas.Service.BAL
                         if (UnionsModel.has_bmc == true && UnionsModel.has_mcc == false)
                         {
                             NewModel.mcc_plant_code = BmcModel.bmc_code; 
-                            MccPlant MccPlantModel = new MccPlant();
-                            MccPlantModel.mcc_plant_code = BmcModel.bmc_code;
+                            MccPlant MccPlantModel = NewRepo.FindByKey<MccPlant>(BmcModel.bmc_code);
+ 
                             MccPlantModel.plant_code = PlantModel.plant_code;
                             MccPlantModel.name = BmcModel.bmc_name;
                             MccPlantModel.union_code = MccPlantModel.originating_org_code = BmcModel.union_code;
                             MccPlantModel.ref_code = BmcModel.bmc_code;
                             MccPlantModel.contact_person = BmcModel.bmc_incharge_name;
-                            MccPlantModel.mobile_no = BmcModel.contact_no;                            
+                            MccPlantModel.mobile_no = BmcModel.contact_no;
+                            MccPlantModel.model_operation = "update";
                             Data.Add(new ModelParameter { SaveModel = MccPlantModel, ValidateModel = new MccPlantValidator() });
                         }
                         else
@@ -116,22 +117,25 @@ namespace DataExchange.Areas.Service.BAL
                         else
                             RouteModel.vehicle_type_code = 2;
 
+                        RouteModel.bmc_code = RouteModel.to_dest;
                         RouteModel.ref_code = RouteModel.route_code;
                         RouteModel.union_code= RouteModel.originating_org_code = UnionsModel.union_code  ;                       
                         Data.Add(new ModelParameter { SaveModel = RouteModel, ValidateModel = new RouteValidator() });
                     }
                     else
                     {
-                        if (NewModel.route_type == null || NewModel.route_type == "")
-                        {
-                            NewModel.route_type = "Can";
-                        }
+                        ////if (NewModel.route_type == null || NewModel.route_type == "")
+                        ////{
+                        ////    NewModel.route_type = "Can";
+                        ////}
 
-                        if (NewModel.route_type == "Can")
+                        if (RouteModel.route_type == "Can")
                             NewModel.vehicle_type_code = 1;
                         else
                             NewModel.vehicle_type_code = 2;
 
+                        NewModel.bmc_code = NewModel.to_dest;
+                        NewModel.route_type = RouteModel.route_type;
                         NewModel.route_name = RouteModel.route_name;
                         NewModel.is_active = RouteModel.is_active;
                         NewModel.route_supervisor_name = RouteModel.route_supervisor_name;

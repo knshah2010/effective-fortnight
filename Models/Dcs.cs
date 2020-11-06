@@ -52,6 +52,7 @@ namespace Models
             RuleFor(d => d.dcs_code).Require();
             RuleFor(d => d.dcs_name).Require();
             RuleFor(d => d.bmc_code).Require().CheckAvailable("tbl_bmc");
+            RuleFor(d => d.route_code).Require().CheckAvailable("tbl_route");
         }
 
     }

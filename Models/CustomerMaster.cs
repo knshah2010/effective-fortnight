@@ -51,6 +51,8 @@ namespace Models
         {
             RuleFor(d => d.customer_code).Require();
             RuleFor(d => d.customer_name).Require();
+            RuleFor(d => d.bmc_code).Require().CheckAvailable("tbl_bmc");
+            RuleFor(d => d.route_code).Require().CheckAvailable("tbl_route");
 
             List<string> customer_type_condition = new List<string> { "1", "2", "3" };
             RuleFor(d => d.customer_type).Must(d => customer_type_condition.Contains(d))

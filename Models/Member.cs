@@ -44,6 +44,7 @@ namespace Models
         {
             RuleFor(d => d.member_code).Require();
             RuleFor(d => d.member_name).Require();
+            RuleFor(d => d.dcs_code).Require().CheckAvailable("tbl_dcs");
         }
 
     }
