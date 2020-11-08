@@ -52,11 +52,11 @@ namespace DataExchange.Areas.Service.Controllers
               
 
         [HttpPost]
-        [Route("upload")]
-        public IActionResult Create([FromForm] IFormFile File, [FromForm] string process_name)
+        [Route("rate")]
+        public IActionResult Create([FromForm] IFormFile File)
         {
             MasterBal _bal = new MasterBal();
-            return _bal.Upload(File, process_name);
+            return _bal.Upload(File);
         }
     }
 }
