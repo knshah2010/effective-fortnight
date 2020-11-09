@@ -37,7 +37,7 @@ namespace Test.Controllers
 
             ListEngine listEngine = new ListEngine();
             SetParam();
-            return listEngine.List(JObject.FromObject(data), "\\Config\\List.json", "test");
+            return listEngine.List(JObject.FromObject(data), "/Config/List.json", "test");
         }
 
         [HttpGet]

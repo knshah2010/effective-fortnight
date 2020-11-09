@@ -312,7 +312,7 @@ namespace DataExchange.Areas.Service.BAL
 
         private void SetRLSHierarchy(ref TmpUserToken _TmpUserToken)
         {
-            JObject json = JObject.Parse(FileHelper.ReadFile(FileHelper.FrameworkPath("DataAccess\\Config\\Setting.json")));
+            JObject json = JObject.Parse(FileHelper.ReadFile(FileHelper.FrameworkPath("DataAccess/Config/Setting.json")));
             JToken hierarchy = json.SelectToken("hierarchy");
             bool IsHierarchy = true;
             if (hierarchy == null || hierarchy.ToString() != "business_hierarchy")
