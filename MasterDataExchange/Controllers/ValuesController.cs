@@ -8,6 +8,8 @@ using Framework.Extension;
 using Framework.CustomDataType;
 using System.Dynamic;
 using Newtonsoft.Json.Linq;
+using Framework.DataAccess.Dapper;
+using Framework.Library.Helper;
 
 namespace Test.Controllers
 {
@@ -36,6 +38,18 @@ namespace Test.Controllers
             ListEngine listEngine = new ListEngine();
             SetParam();
             return listEngine.List(JObject.FromObject(data), "\\Config\\List.json", "test");
+        }
+
+        [HttpGet]
+        [Route("csv")]
+        public IActionResult CSV()
+        {
+            DBRepository repo = new DBRepository();
+            string tablename = NumericHelper.RandomNumber().ToString()+"tmp";
+            repo.Add(new QueryParam{
+                DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,fat decimal(18,2),snf decimal(18,2),milk_type varchar(5),rtpl decimal(18,2),milk_type_code int null); LOAD DATA LOCAL INFILE  'O:/Roshani/Projects/DataExchangeAPI/FileServer/Import/Upload/rate_chart_comma_sqparated.csv' INTO TABLE {tablename} FIELDS TERMINATED BY ';'  IGNORE 1 ROWS (fat, snf,milk_type,rtpl); "
+            });
+            return null;
         }
 
         // GET api/values/5
