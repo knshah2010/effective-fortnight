@@ -184,15 +184,15 @@ namespace DataExchange.Areas.Service.BAL
             {
                 if (MemberModel.member_code != "")
                 {
+                    if (MemberModel.member_code.Length > 4)
+                    {
+                        return new CustomResult("success", new CustomResponse { status = "300", msg = "error:member_code:Max Length Should be 4" });
+                    }
+                    MemberModel.member_code = MemberModel.dcs_code + MemberModel.ex_member_code.PadLeft(4, '0');
                     Member NewModel = NewRepo.FindByKey<Member>(MemberModel.member_code);
                     if (NewModel == null)
-                    {
-                        if (MemberModel.member_code.Length > 4)
-                        {
-                            return new CustomResult("success", new CustomResponse { status = "300", msg = "error:member_code:Max Length Should be 4" });
-                        }
-                        MemberModel.ex_member_code = MemberModel.member_code;
-                        MemberModel.member_code = MemberModel.dcs_code + MemberModel.ex_member_code.PadLeft(4, '0');
+                    {                        
+                        MemberModel.ex_member_code = MemberModel.member_code;                        
                         MemberModel.originating_org_code = UnionsModel.union_code;
                         if(MemberModel.client_code==null || MemberModel.client_code.Trim() == "")
                         {

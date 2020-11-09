@@ -4,7 +4,6 @@ using Framework.DataAccess.Dapper;
 using Framework.Library.Helper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -61,14 +60,36 @@ namespace DataExchange.Areas.Service.Utility
         }
 
         private void UpdateData()
-        {
-            string tablename = NumericHelper.RandomNumber().ToString() + _token;
-            string tmp = "('";
-            tmp+=string.Join("'),('", _responseList.Where(x => x.status == "200").Select(x => x.key_code).ToArray())+"');";
-            Repo.Add(new QueryParam
+        {   
+            if (_responseList.Count() > 0)
             {
-                DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,key_code varchar(20) null);insert into {tablename} (key_code) values  {tmp} update {_Config.table} inner join {tablename} on key_code={_Config.field} set send_status=1;drop table {tablename}"
-            });
+                string tablename = NumericHelper.RandomNumber().ToString() + _token;
+                string tmp1 = $"insert into {tablename} (key_code,update_status) values ('", tmp2 = $"insert into {tablename} (key_code,update_status) values ('";
+                string[] flg1 = _responseList.Where(x => x.status == "200").Select(x => x.key_code).ToArray();
+                if (flg1.Count() > 0)
+                {
+                    tmp1 += string.Join("',1),('", flg1) + "',1);";
+                }
+                else
+                {
+                    tmp1 = "";
+                }
+                string[] flg2 = _responseList.Where(x => x.status == "300").Select(x => x.key_code).ToArray();
+                if (flg2.Count() > 0)
+                {
+                    tmp2 += string.Join("',2),('", flg2) + "',2);";
+                }
+                else
+                {
+                    tmp2 = "";
+                }
+
+                Repo.Add(new QueryParam
+                {
+                    DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,key_code varchar(20) null,update_status int null); {tmp1}{tmp2} update {_Config.table} inner join {tablename} on key_code={_Config.field} set send_status=update_status;drop table {tablename}"
+                });
+            }
+            
         }
     }
     class ApiConfig
