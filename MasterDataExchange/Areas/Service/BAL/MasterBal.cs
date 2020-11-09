@@ -103,7 +103,7 @@ namespace DataExchange.Areas.Service.BAL
                     if (NewModel == null)
                     {   
                         RouteModel.vehicle_type_code = (RouteModel.route_type == "Can") ? 1 : 2;
-                        RouteModel.bmc_code = RouteModel.to_dest;
+                        RouteModel.to_dest = RouteModel.bmc_code;                        
                         RouteModel.ref_code = RouteModel.route_code;
                         RouteModel.union_code= RouteModel.originating_org_code = UnionsModel.union_code  ;                       
                         Data.Add(new ModelParameter { SaveModel = RouteModel, ValidateModel = new RouteValidator() });
@@ -111,8 +111,7 @@ namespace DataExchange.Areas.Service.BAL
                     else
                     {
                         NewModel.vehicle_type_code = (RouteModel.route_type == "Can") ? 1 : 2;
-                        NewModel.bmc_code = NewModel.to_dest;
-                        NewModel.route_type = RouteModel.route_type;
+                        NewModel.to_dest = NewModel.bmc_code;                        
                         NewModel.route_name = RouteModel.route_name;
                         NewModel.is_active = RouteModel.is_active;
                         NewModel.route_supervisor_name = RouteModel.route_supervisor_name;
@@ -155,6 +154,8 @@ namespace DataExchange.Areas.Service.BAL
                     else
                     {                      
                         NewModel.dcs_name = DcsModel.dcs_name;
+                        NewModel.bmc_code = DcsModel.bmc_code;
+                        NewModel.route_code = DcsModel.route_code;
                         NewModel.is_active = DcsModel.is_active;
                         NewModel.contact_person = DcsModel.contact_person;
                         NewModel.mobile_no = DcsModel.mobile_no;
@@ -183,11 +184,26 @@ namespace DataExchange.Areas.Service.BAL
                     Member NewModel = NewRepo.FindByKey<Member>(MemberModel.member_code);
                     if (NewModel == null)
                     {
+                        if (MemberModel.member_code.Length > 4)
+                        {
+                            return new CustomResult("success", new CustomResponse { status = "300", msg = "error:member_code:Max Length Should be 4" });
+                        }
+                        MemberModel.ex_member_code = MemberModel.member_code;
+                        MemberModel.member_code = MemberModel.dcs_code + MemberModel.ex_member_code.PadLeft(4, '0');
                         MemberModel.originating_org_code = UnionsModel.union_code;
+                        if(MemberModel.client_code==null || MemberModel.client_code.Trim() == "")
+                        {
+                            MemberModel.ref_code = MemberModel.member_code;
+                        }
+                        else
+                        {
+                            MemberModel.ref_code = MemberModel.client_code;
+                        }
                         Data.Add(new ModelParameter { SaveModel = MemberModel, ValidateModel = new MemberValidator() });
                     }
                     else
                     {
+                        NewModel.dcs_code = MemberModel.dcs_code;
                         NewModel.member_name = MemberModel.member_name;
                         NewModel.is_active = MemberModel.is_active;
                         NewModel.mobile_no = MemberModel.mobile_no;
@@ -198,7 +214,7 @@ namespace DataExchange.Areas.Service.BAL
                 }
                 else
                 {
-                    _response.Add(new CustomResponse { status = "300", msg = "error:dcs_code" });
+                    _response.Add(new CustomResponse { status = "300", msg = "error:member_code" });
                 }
             }
             return new CustomResult("success", _response);
@@ -220,6 +236,8 @@ namespace DataExchange.Areas.Service.BAL
                     }
                     else
                     {
+                        NewModel.bmc_code = CustomerMasterModel.bmc_code;
+                        NewModel.route_code = CustomerMasterModel.route_code;
                         NewModel.customer_name = CustomerMasterModel.customer_name;
                         NewModel.is_active = CustomerMasterModel.is_active;
                         NewModel.mobile_no = CustomerMasterModel.mobile_no;

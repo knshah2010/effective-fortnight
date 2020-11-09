@@ -17,7 +17,7 @@ namespace Models
         public string route_name { get; set; }
         public string ref_code { get; set; }
         public string to_dest { get; set; }
-        public string to_type { get; set; }
+        public string to_type { get; set; } = "bmc";
         public int capacity { get; set; } = 1;
         public string route_type { get; set; }
         public float route_length_kms { get; set; } 
@@ -50,7 +50,7 @@ namespace Models
             RuleFor(d => d.route_code).Require();
             RuleFor(d => d.route_name).Require();
             RuleFor(d => d.bmc_code).Require().CheckAvailable("tbl_bmc");
-
+            RuleFor(d => d.is_active).Require();
             List<string> route_type_condition = new List<string> { "Can", "Tanker"};
             RuleFor(d => d.route_type).Must(d => route_type_condition.Contains(d))
                     .WithMessage("Please only use: " + String.Join(",", route_type_condition));
