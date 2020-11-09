@@ -1,0 +1,12 @@
+{
+  "milk_collection": {
+    "url": "bmc_config",
+    "sp": "sp_name",
+    "table": "tbl_milk_collection",
+    "field": "milk_collection_code",
+    "type": "application/json"
+   // "headers": {
+   //   "key": "value"
+   // }
+  }
+}
