@@ -5,7 +5,7 @@
     "join": [
       {
         "table": "tbl_shift",
-        "condition": "tbl_shift.shift_code=tbl_milk_collection.shift_code"
+        "condition": "tbl_shift.id=tbl_milk_collection.shift_code"
       },
       {
         "table": "tbl_animal_type",
