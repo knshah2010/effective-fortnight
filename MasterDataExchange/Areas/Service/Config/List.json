@@ -1,0 +1,18 @@
+{
+  "milk_collection": {
+    "table": "tbl_milk_collection",
+    "fields": "milk_collection_code,shift_code,tbl_animal_type.short_name as milk_type,qty,fat,snf,rtpl,amount,sample_no",
+    "join": [
+      {
+        "table": "tbl_shift",
+        "condition": "tbl_shift.shift_code=tbl_milk_collection.shift_code"
+      },
+      {
+        "table": "tbl_animal_type",
+        "condition": "tbl_animal_type.animal_type_code=tbl_milk_collection.milk_type_code"
+      }
+    ],
+
+    "require": "bmc_code,date_time_of_collection"
+  }
+}

@@ -11,5 +11,14 @@ namespace DataExchange.Areas.Service.Controllers
     [Route("{v:apiVersion}/Service/[controller]")]
     public class TransactionController : BaseController
     {
+
+        [HttpPost]
+        [Route("list")]
+        public IActionResult List([FromBody] object data)
+        {
+            ListEngine _listEngine = new ListEngine();
+            SetParam();
+            return _listEngine.List(data, FileName, "milk_collection");
+        }
     }
 }
