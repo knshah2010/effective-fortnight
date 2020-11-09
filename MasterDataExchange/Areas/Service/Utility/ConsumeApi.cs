@@ -64,7 +64,7 @@ namespace DataExchange.Areas.Service.Utility
         {
             string tablename = NumericHelper.RandomNumber().ToString() + _token;
             string tmp = "('";
-            tmp+=string.Join("'),('", _responseList. (x => x.status == "200").Select(x => x.key_code).ToArray())+"');";
+            tmp+=string.Join("'),('", _responseList.Where(x => x.status == "200").Select(x => x.key_code).ToArray())+"');";
             Repo.Add(new QueryParam
             {
                 DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,key_code varchar(20) null);insert into {tablename} (key_code) values  {tmp} update {_Config.table} inner join {tablename} on key_code={_Config.field} set send_status=1;drop table {tablename}"
