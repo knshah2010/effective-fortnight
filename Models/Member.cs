@@ -32,8 +32,10 @@ namespace Models
         public string x_col3 { get; set; }
         public string x_col4 { get; set; }
         public string x_col5 { get; set; }
+        public string ref_code { get; set; }
 
         [Computed]
+        public string client_code { get; set; } 
         public new string flg_sentbox_entry { get; set; } = "N";
         public string originating_org_type { get; set; } = "portal";
     }
@@ -44,6 +46,7 @@ namespace Models
         {
             RuleFor(d => d.member_code).Require();
             RuleFor(d => d.member_name).Require();
+            RuleFor(d => d.is_active).Require();
             RuleFor(d => d.dcs_code).Require().CheckAvailable("tbl_dcs");
         }
 
