@@ -49,7 +49,15 @@ namespace DataExchange.Areas.Service.Controllers
             MasterBal _bal = new MasterBal();
             return _bal.SaveCustomer(data.ParseRequestList<CustomerMaster>());
         }
-              
+
+        [HttpPost]
+        [Route("rate_applicability")]
+        public IActionResult RateApplicability([FromBody] object data)
+        {
+            MasterBal _bal = new MasterBal();
+            return _bal.PurchaseRateApplicability(data.ParseRequestList<PurchaseRateApplicability>());
+        }
+
 
         [HttpPost]
         [Route("rate")]

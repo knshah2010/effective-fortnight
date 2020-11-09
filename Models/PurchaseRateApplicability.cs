@@ -5,6 +5,8 @@ using Framework.Library.Validator;
 using System;
 using Framework.Library.Helper;
 using System.Numerics;
+using Framework.CustomDataType;
+using System.Collections.Generic;
 
 namespace Models
 {
@@ -12,7 +14,7 @@ namespace Models
     public class PurchaseRateApplicability : BaseModel
     {
         [ExplicitKey]
-        public BigInteger rate_app_code { get; set; }
+        public string rate_app_code { get; set; }
         public int shift_code { get; set; }
         public int is_download { get; set; }
         public DateTime wef_date { get; set; }
@@ -29,13 +31,23 @@ namespace Models
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
         public string originating_org_type { get; set; } = "portal";
+        [Computed]
+        public string module_code { get; set; }
     }
 
     public class PurchaseRateApplicabilityValidator : AbstractValidator<PurchaseRateApplicability>
     {
         public PurchaseRateApplicabilityValidator()
         {
-            
+            List<ConditionParameter> Condition = new List<ConditionParameter>
+            {
+                new ConditionParameter { PropertyName= "wef_date",Operator=">"},
+                new ConditionParameter { PropertyName= "shift_code"},
+                new ConditionParameter { PropertyName= "dcs_code"},
+                new ConditionParameter { PropertyName= "purchase_rate_code"},
+            };
+
+            RuleFor(d => d).Unique(Condition, "rate_app_code");
         }
     }
 }

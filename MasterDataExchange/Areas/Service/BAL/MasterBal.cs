@@ -252,12 +252,34 @@ namespace DataExchange.Areas.Service.BAL
                 }
                 else
                 {
-                    _response.Add(new CustomResponse { status = "300", msg = "error:dcs_code" });
+                    _response.Add(new CustomResponse { status = "300", msg = "error:customer_code" });
                 }
             }
             return new CustomResult("success", _response);
         }
-                
+
+
+        public IActionResult PurchaseRateApplicability(List<PurchaseRateApplicability> PurchaseRateApplicabilityList)
+        {
+            Unions UnionsModel = GetLastRecord<Unions>("tbl_unions");
+
+            foreach (PurchaseRateApplicability PurchaseRateApplicabilityModel in PurchaseRateApplicabilityList)
+            {
+                if (PurchaseRateApplicabilityModel.rate_app_code != "")
+                {
+                    PurchaseRateApplicabilityModel.originating_org_code = PurchaseRateApplicabilityModel.union_code = UnionsModel.union_code;
+                    PurchaseRateApplicabilityModel.module_code = PurchaseRateApplicabilityModel.dcs_code;
+                    Data.Add(new ModelParameter { SaveModel = PurchaseRateApplicabilityModel, ValidateModel = new PurchaseRateApplicabilityValidator() });
+                    SaveData(PurchaseRateApplicabilityModel.rate_app_code);
+                }
+                else
+                {
+                    _response.Add(new CustomResponse { status = "300", msg = "error:rate_app_code" });
+                }
+            }
+            return new CustomResult("success", _response);
+        }
+
         private void SaveData(string code)
         {
             result = SingleRecordTransaction(Data, 3);
