@@ -1,4 +1,5 @@
 ﻿using DataExchange.Areas.Service.Models;
+using DataExchange.Areas.Service.Utility;
 using Framework.BAL;
 using Framework.CustomDataType;
 using Framework.Extension;
@@ -7,6 +8,7 @@ using Framework.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -188,11 +190,12 @@ namespace DataExchange.Areas.Service.BAL
                     {
                         return new CustomResult("success", new CustomResponse { status = "300", msg = "error:member_code:Max Length Should be 4" });
                     }
+                    string tmp = MemberModel.member_code;
                     MemberModel.member_code = MemberModel.dcs_code + MemberModel.member_code.PadLeft(4, '0');
                     Member NewModel = NewRepo.FindByKey<Member>(MemberModel.member_code);
                     if (NewModel == null)
                     {                        
-                        MemberModel.ex_member_code = MemberModel.member_code;                        
+                        MemberModel.ex_member_code = tmp;                        
                         MemberModel.originating_org_code = UnionsModel.union_code;
                         if(MemberModel.client_code==null || MemberModel.client_code.Trim() == "")
                         {
@@ -262,20 +265,32 @@ namespace DataExchange.Areas.Service.BAL
         public IActionResult PurchaseRateApplicability(List<PurchaseRateApplicability> PurchaseRateApplicabilityList)
         {
             Unions UnionsModel = GetLastRecord<Unions>("tbl_unions");
-
+            QueryParam Query = new QueryParam
+            {
+                Fields = "*"                
+            };
+            IEnumerable<Shift> shiftList = NewRepo.FindAll<Shift>(Query);            
+            int code = NewRepo.Find<int>(new QueryParam { DirectQuery = "select IFNULL(max(rate_app_code),0) from tbl_purchase_rate_applicability" });
+            
             foreach (PurchaseRateApplicability PurchaseRateApplicabilityModel in PurchaseRateApplicabilityList)
             {
-                if (PurchaseRateApplicabilityModel.rate_app_code != "")
+                if (PurchaseRateApplicabilityModel.module_name.ToLower() == "dcs" )
                 {
-                    PurchaseRateApplicabilityModel.originating_org_code = PurchaseRateApplicabilityModel.union_code = UnionsModel.union_code;
-                    PurchaseRateApplicabilityModel.module_code = PurchaseRateApplicabilityModel.dcs_code;
-                    Data.Add(new ModelParameter { SaveModel = PurchaseRateApplicabilityModel, ValidateModel = new PurchaseRateApplicabilityValidator() });
-                    SaveData(PurchaseRateApplicabilityModel.rate_app_code);
+                    if(PurchaseRateApplicabilityModel.rate_for == "farmer_collection")
+                    {
+                        PurchaseRateApplicabilityModel.rate_app_code = (code + 1).ToString();
+                        PurchaseRateApplicabilityModel.originating_org_code = PurchaseRateApplicabilityModel.union_code = UnionsModel.union_code;
+                        PurchaseRateApplicabilityModel.dcs_code = PurchaseRateApplicabilityModel.module_code;
+                        PurchaseRateApplicabilityModel.shift_code = shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.id).FirstOrDefault();
+                        string time= PurchaseRateApplicabilityModel.wef_date.ToString("yyyy-MM-dd")+" "+ shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.shift_time.ToString(@"hh\:mm\:ss")).FirstOrDefault();
+                        PurchaseRateApplicabilityModel.wef_date = DateHelper.ParseDate(time);
+                        Data.Add(new ModelParameter { SaveModel = PurchaseRateApplicabilityModel, ValidateModel = new PurchaseRateApplicabilityValidator() });
+                        SaveData(PurchaseRateApplicabilityModel.sr_no);
+                    }
+                    
                 }
-                else
-                {
-                    _response.Add(new CustomResponse { status = "300", msg = "error:rate_app_code" });
-                }
+                    
+               
             }
             return new CustomResult("success", _response);
         }

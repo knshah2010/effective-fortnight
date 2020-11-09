@@ -29,10 +29,18 @@ namespace Models
         public string x_col5 { get; set; }
         public bool is_active { get; set; }
         [Computed]
+        public string sr_no { get; set; }
+        [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
         public string originating_org_type { get; set; } = "portal";
         [Computed]
         public string module_code { get; set; }
+        [Computed]
+        public string module_name { get; set; }
+        [Computed]
+        public string rate_for { get; set; }
+        [Computed]
+        public string shift { get; set; } = "M";
     }
 
     public class PurchaseRateApplicabilityValidator : AbstractValidator<PurchaseRateApplicability>
