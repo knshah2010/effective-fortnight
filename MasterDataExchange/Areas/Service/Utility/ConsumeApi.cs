@@ -34,14 +34,11 @@ namespace DataExchange.Areas.Service.Utility
             {
                 request.Headers.TryAddWithoutValidation(header.Key, header.Value);
             }
-
-            request.Content = new StringContent(JsonConvert.SerializeObject(DataList), Encoding.UTF8, _Config.type);
-            bool sent = false;
+            request.Content = new StringContent(JsonConvert.SerializeObject(DataList), Encoding.UTF8, _Config.type);            
             HttpResponseMessage result;
             using (var client = new HttpClient())
             {
-                result = await client.SendAsync(request);
-                sent = sent && result.IsSuccessStatusCode;
+                result = await client.SendAsync(request);                
                 if (result.IsSuccessStatusCode)
                 {
                     var jsonString = await result.Content.ReadAsStringAsync();                    
