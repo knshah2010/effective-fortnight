@@ -4,6 +4,7 @@ using FluentValidation;
 using Framework.Library.Validator;
 using System;
 using Framework.Library.Helper;
+using System.Collections.Generic;
 
 namespace Models
 {
@@ -16,8 +17,8 @@ namespace Models
         public string route_name { get; set; }
         public string ref_code { get; set; }
         public string to_dest { get; set; }
-        public string to_type { get; set; }
-        public int capacity { get; set; } = 0;
+        public string to_type { get; set; } = "bmc";
+        public int capacity { get; set; } = 1;
         public string route_type { get; set; }
         public float route_length_kms { get; set; } 
         public string morning_start_time { get; set; }
@@ -31,8 +32,16 @@ namespace Models
         public string x_col3 { get; set; }
         public string x_col4 { get; set; }
         public string x_col5 { get; set; }
+        public bool is_active { get; set; } = true;
+        public string route_supervisor_name { get; set; }
+        public string contact_no { get; set; }
+
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
+        [Computed]
+        public string bmc_code { get; set; }
+        public string originating_org_type { get; set; } = "portal";
+
     }
     public class RouteValidator : AbstractValidator<Route>
     {
@@ -40,6 +49,11 @@ namespace Models
         {
             RuleFor(d => d.route_code).Require();
             RuleFor(d => d.route_name).Require();
+            RuleFor(d => d.bmc_code).Require().CheckAvailable("tbl_bmc");
+            RuleFor(d => d.is_active).Require();
+            List<string> route_type_condition = new List<string> { "Can", "Tanker"};
+            RuleFor(d => d.route_type).Must(d => route_type_condition.Contains(d))
+                    .WithMessage("Please only use: " + String.Join(",", route_type_condition));
         }
 
     }

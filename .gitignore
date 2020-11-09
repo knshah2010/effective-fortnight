@@ -5,3 +5,4 @@ MasterDataExchange/Properties/*
 Models/bin/*
 Models/obj/*
 DataExchangeApi.sln
+FileServer/*
