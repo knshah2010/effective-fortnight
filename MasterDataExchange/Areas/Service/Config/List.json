@@ -12,7 +12,12 @@
         "condition": "tbl_animal_type.animal_type_code=tbl_milk_collection.milk_type_code"
       }
     ],
-
+    "where": [
+      {
+        "propertyname": "data_post_status",
+        "propertyvalue": "0"
+      }
+    ],
     "require": "bmc_code,date_time_of_collection"
   }
 }

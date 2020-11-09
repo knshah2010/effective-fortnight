@@ -7,8 +7,8 @@ using Framework.Library.Helper;
 
 namespace Models
 {
-    [Table("tbl_milk_collection")]
-    public class MilkCollection : BaseModel
+    [Table("tbl_bmc_collection")]
+    public class BmcCollection : BaseModel
     {
         [Key]
         [ExplicitKey]
@@ -105,13 +105,5 @@ namespace Models
         public string token { get; set; }
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
-    }
-
-    public class MilkCollectionValidator : AbstractValidator<MilkCollection>
-    {
-        public MilkCollectionValidator()
-        {
-
-        }
     }
 }
