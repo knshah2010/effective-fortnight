@@ -103,7 +103,8 @@ namespace DataExchange.Areas.Service.BAL
                     if (NewModel == null)
                     {   
                         RouteModel.vehicle_type_code = (RouteModel.route_type == "Can") ? 1 : 2;
-                        RouteModel.to_dest = RouteModel.bmc_code;                        
+                        RouteModel.to_dest = RouteModel.bmc_code;
+                        RouteModel.to_type = "bmc";
                         RouteModel.ref_code = RouteModel.route_code;
                         RouteModel.union_code= RouteModel.originating_org_code = UnionsModel.union_code  ;                       
                         Data.Add(new ModelParameter { SaveModel = RouteModel, ValidateModel = new RouteValidator() });
@@ -111,7 +112,8 @@ namespace DataExchange.Areas.Service.BAL
                     else
                     {
                         NewModel.vehicle_type_code = (RouteModel.route_type == "Can") ? 1 : 2;
-                        NewModel.to_dest = NewModel.bmc_code;                        
+                        NewModel.to_dest = RouteModel.bmc_code;
+                        NewModel.bmc_code = RouteModel.bmc_code;
                         NewModel.route_name = RouteModel.route_name;
                         NewModel.is_active = RouteModel.is_active;
                         NewModel.route_supervisor_name = RouteModel.route_supervisor_name;
@@ -159,6 +161,7 @@ namespace DataExchange.Areas.Service.BAL
                         NewModel.is_active = DcsModel.is_active;
                         NewModel.contact_person = DcsModel.contact_person;
                         NewModel.mobile_no = DcsModel.mobile_no;
+                        NewModel.allow_multiple_milktype = DcsModel.allow_multiple_milktype;
                         NewModel.x_col1 = SetDcsXcol(DcsModel.allow_multiple_milktype);
                         NewModel.model_operation = "update";
                         Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new DcsValidator() });
