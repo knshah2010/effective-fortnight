@@ -204,6 +204,7 @@ namespace DataExchange.Areas.Service.BAL
                     }
                     else
                     {
+                        NewModel.member_unique_code = MemberModel.member_unique_code;
                         NewModel.dcs_code = MemberModel.dcs_code;
                         NewModel.member_name = MemberModel.member_name;
                         NewModel.is_active = MemberModel.is_active;
@@ -233,12 +234,15 @@ namespace DataExchange.Areas.Service.BAL
                     if (NewModel == null)
                     {
                         CustomerMasterModel.ref_code = CustomerMasterModel.customer_unique_code;
+                        CustomerMasterModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
                         CustomerMasterModel.originating_org_code = CustomerMasterModel.union_code = UnionsModel.union_code;                        
                         Data.Add(new ModelParameter { SaveModel = CustomerMasterModel, ValidateModel = new CustomerMasterValidator() });
                     }
                     else
                     {
+                        NewModel.customer_unique_code = CustomerMasterModel.customer_unique_code;
                         NewModel.bmc_code = CustomerMasterModel.bmc_code;
+                        NewModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
                         NewModel.route_code = CustomerMasterModel.route_code;
                         NewModel.customer_name = CustomerMasterModel.customer_name;
                         NewModel.is_active = CustomerMasterModel.is_active;
