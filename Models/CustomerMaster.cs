@@ -41,6 +41,8 @@ namespace Models
         public string x_col5 { get; set; }
         public string mobile_no { get; set; }
         [Computed]
+        public int allow_multiple_milktype { get; set; }
+        [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
         public string originating_org_type { get; set; } = "portal";
     }
@@ -55,7 +57,7 @@ namespace Models
             RuleFor(d => d.bmc_code).Require().CheckAvailable("tbl_bmc");
             RuleFor(d => d.route_code).Require().CheckAvailable("tbl_route");
 
-            List<string> customer_type_condition = new List<string> { "1", "2", "3" };
+            List<string> customer_type_condition = new List<string> { "VENDOR","BULKVEN","VLCCVEN" };
             RuleFor(d => d.customer_type).Must(d => customer_type_condition.Contains(d))
                     .WithMessage("Please only use: " + String.Join(",", customer_type_condition));
         }

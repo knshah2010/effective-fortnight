@@ -197,13 +197,13 @@ namespace DataExchange.Areas.Service.BAL
                     {                        
                         MemberModel.ex_member_code = tmp;                        
                         MemberModel.originating_org_code = UnionsModel.union_code;
-                        if(MemberModel.client_code==null || MemberModel.client_code.Trim() == "")
+                        if(MemberModel.member_unique_code == null || MemberModel.member_unique_code.Trim() == "")
                         {
                             MemberModel.ref_code = MemberModel.member_code;
                         }
                         else
                         {
-                            MemberModel.ref_code = MemberModel.client_code;
+                            MemberModel.ref_code = MemberModel.member_unique_code;
                         }
                         Data.Add(new ModelParameter { SaveModel = MemberModel, ValidateModel = new MemberValidator() });
                     }
