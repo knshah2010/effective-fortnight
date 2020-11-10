@@ -18,6 +18,30 @@
         "propertyvalue": "0"
       }
     ],
-    "require": "bmc_code,date_time_of_collection"
+    "require": "bmc_code,date_time_of_collection",
+    "direct_list": "true"
+  },
+
+  "rmrd_collection": {
+    "table": "tbl_bmc_collection",
+    "fields": "milk_collection_code,shift_code,tbl_animal_type.short_name as milk_type,qty,fat,snf,rtpl,amount,sample_no",
+    "join": [
+      {
+        "table": "tbl_shift",
+        "condition": "tbl_shift.id=tbl_bmc_collection.shift_code"
+      },
+      {
+        "table": "tbl_animal_type",
+        "condition": "tbl_animal_type.animal_type_code=tbl_bmc_collection.milk_type_code"
+      }
+    ],
+    "where": [
+      {
+        "propertyname": "data_post_status",
+        "propertyvalue": "0"
+      }
+    ],
+    "require": "bmc_code,date_time_of_collection",
+    "direct_list": "true"
   }
 }

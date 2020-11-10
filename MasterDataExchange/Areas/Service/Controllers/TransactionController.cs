@@ -23,6 +23,15 @@ namespace DataExchange.Areas.Service.Controllers
         }
 
         [HttpPost]
+        [Route("rmrd_collection")]
+        public IActionResult RmrdCollection([FromBody] object data)
+        {
+            ListEngine _listEngine = new ListEngine();
+            SetParam();
+            return _listEngine.List(data, FileName, "rmrd_collection");
+        }
+
+        [HttpPost]
         [Route("milkcollection_ack")]
         public IActionResult Ack([FromBody] object data)
         {
