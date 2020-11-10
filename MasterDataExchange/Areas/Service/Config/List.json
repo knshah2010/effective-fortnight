@@ -16,9 +16,19 @@
       {
         "propertyname": "data_post_status",
         "propertyvalue": "0"
+      },
+      {
+        "propertyname": "from_date",
+        "actualproperty": "date_time_of_collection",
+        "operator": "between"
+      },
+      {
+        "propertyname": "to_date",
+        "actualproperty": "date_time_of_collection",
+        "operator": "between"
       }
     ],
-    "require": "bmc_code,date_time_of_collection",
+    "require": "bmc_code,from_date,to_date",
     "direct_list": "true"
   },
 

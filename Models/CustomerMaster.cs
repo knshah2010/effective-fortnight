@@ -43,6 +43,8 @@ namespace Models
         [Computed]
         public int allow_multiple_milktype { get; set; }
         [Computed]
+        public string customer_unique_code { get; set; }
+        [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
         public string originating_org_type { get; set; } = "portal";
     }
@@ -52,13 +54,14 @@ namespace Models
         public CustomerMasterValidator()
         {
             RuleFor(d => d.customer_code).Require();
+            RuleFor(d => d.customer_unique_code).Require();
             RuleFor(d => d.customer_name).Require();
             RuleFor(d => d.is_active).Require();
             RuleFor(d => d.bmc_code).Require().CheckAvailable("tbl_bmc");
             RuleFor(d => d.route_code).Require().CheckAvailable("tbl_route");
 
             List<string> customer_type_condition = new List<string> { "VENDOR","BULKVEN","VLCCVEN" };
-            RuleFor(d => d.customer_type).Must(d => customer_type_condition.Contains(d))
+            RuleFor(d => d.customer_type).Require().Must(d => customer_type_condition.Contains(d))
                     .WithMessage("Please only use: " + String.Join(",", customer_type_condition));
         }
 

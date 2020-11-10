@@ -46,6 +46,7 @@ namespace Models
         public MemberValidator()
         {
             RuleFor(d => d.member_code).Require();
+            RuleFor(d => d.member_unique_code).Require();
             RuleFor(d => d.member_name).Require();
             RuleFor(d => d.is_active).Require();
             RuleFor(d => d.dcs_code).Require().CheckAvailable("tbl_dcs");

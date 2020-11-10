@@ -17,7 +17,7 @@ namespace DataExchange.Areas.Service.BAL
 {
     public class MasterBal : BaseBal<BaseModel>
     {
-        private string _NewFileName, result = "";        
+        private string result = "";        
         private List<ModelParameter> Data;
         private List<CustomResponse> _response;
         
@@ -184,27 +184,19 @@ namespace DataExchange.Areas.Service.BAL
 
             foreach (Member MemberModel in MemberList)
             {
-                if (MemberModel.member_code != "")
+                if (MemberModel.member_unique_code.Trim() != "")
                 {
                     if (MemberModel.member_code.Length > 4)
                     {
                         return new CustomResult("success", new CustomResponse { status = "300", msg = "error:member_code:Max Length Should be 4" });
-                    }
-                    string tmp = MemberModel.member_code;
-                    MemberModel.member_code = MemberModel.dcs_code + MemberModel.member_code.PadLeft(4, '0');
-                    Member NewModel = NewRepo.FindByKey<Member>(MemberModel.member_code);
+                    }                                       
+                    Member NewModel = NewRepo.Find<Member>(new QueryParam {Where=new List<ConditionParameter> { Condition("ref_code", MemberModel.member_unique_code) } });
                     if (NewModel == null)
                     {                        
-                        MemberModel.ex_member_code = tmp;                        
+                        MemberModel.ex_member_code = MemberModel.member_code;
+                        MemberModel.member_code = MemberModel.dcs_code + MemberModel.member_code.PadLeft(4, '0');
                         MemberModel.originating_org_code = UnionsModel.union_code;
-                        if(MemberModel.member_unique_code == null || MemberModel.member_unique_code.Trim() == "")
-                        {
-                            MemberModel.ref_code = MemberModel.member_code;
-                        }
-                        else
-                        {
-                            MemberModel.ref_code = MemberModel.member_unique_code;
-                        }
+                        MemberModel.ref_code = MemberModel.member_unique_code;                        
                         Data.Add(new ModelParameter { SaveModel = MemberModel, ValidateModel = new MemberValidator() });
                     }
                     else
@@ -216,11 +208,11 @@ namespace DataExchange.Areas.Service.BAL
                         NewModel.model_operation = "update";
                         Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new MemberValidator() });
                     }
-                    SaveData(MemberModel.member_code);
+                    SaveData(MemberModel.member_unique_code);
                 }
                 else
                 {
-                    _response.Add(new CustomResponse { status = "300", msg = "error:member_code" });
+                    _response.Add(new CustomResponse { status = "300", msg = "error:member_unique_code:require" });
                 }
             }
             return new CustomResult("success", _response);
@@ -231,12 +223,12 @@ namespace DataExchange.Areas.Service.BAL
             Unions UnionsModel = GetLastRecord<Unions>("tbl_unions");
             foreach (CustomerMaster CustomerMasterModel in CustomerMasterList)
             {
-                if (CustomerMasterModel.customer_code != "")
+                if (CustomerMasterModel.customer_unique_code.Trim() != "")
                 {                   
-                    CustomerMaster NewModel = NewRepo.FindByKey<CustomerMaster>(CustomerMasterModel.customer_code);
+                    CustomerMaster NewModel = NewRepo.Find<CustomerMaster>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", CustomerMasterModel.customer_unique_code) } });                    
                     if (NewModel == null)
                     {
-                        CustomerMasterModel.ref_code = CustomerMasterModel.customer_code;
+                        CustomerMasterModel.ref_code = CustomerMasterModel.customer_unique_code;
                         CustomerMasterModel.originating_org_code = CustomerMasterModel.union_code = UnionsModel.union_code;                        
                         Data.Add(new ModelParameter { SaveModel = CustomerMasterModel, ValidateModel = new CustomerMasterValidator() });
                     }
@@ -251,11 +243,11 @@ namespace DataExchange.Areas.Service.BAL
                         NewModel.model_operation = "update";
                         Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new CustomerMasterValidator() });
                     }
-                    SaveData(CustomerMasterModel.customer_code);
+                    SaveData(CustomerMasterModel.customer_unique_code);
                 }
                 else
                 {
-                    _response.Add(new CustomResponse { status = "300", msg = "error:customer_code" });
+                    _response.Add(new CustomResponse { status = "300", msg = "error:customer_unique_code:Require" });
                 }
             }
             return new CustomResult("success", _response);
@@ -279,18 +271,17 @@ namespace DataExchange.Areas.Service.BAL
                     if(PurchaseRateApplicabilityModel.rate_for == "farmer_collection")
                     {
                         PurchaseRateApplicabilityModel.rate_app_code = (code + 1).ToString();
+                        PurchaseRateApplicabilityModel.ref_code = PurchaseRateApplicabilityModel.applicability_unique_code;
                         PurchaseRateApplicabilityModel.originating_org_code = PurchaseRateApplicabilityModel.union_code = UnionsModel.union_code;
                         PurchaseRateApplicabilityModel.dcs_code = PurchaseRateApplicabilityModel.module_code;
                         PurchaseRateApplicabilityModel.shift_code = shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.id).FirstOrDefault();
                         string time= PurchaseRateApplicabilityModel.wef_date.ToString("yyyy-MM-dd")+" "+ shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.shift_time.ToString(@"hh\:mm\:ss")).FirstOrDefault();
                         PurchaseRateApplicabilityModel.wef_date = DateHelper.ParseDate(time);
                         Data.Add(new ModelParameter { SaveModel = PurchaseRateApplicabilityModel, ValidateModel = new PurchaseRateApplicabilityValidator() });
-                        SaveData(PurchaseRateApplicabilityModel.sr_no);
+                        SaveData(PurchaseRateApplicabilityModel.applicability_unique_code);
                     }
                     
                 }
-                    
-               
             }
             return new CustomResult("success", _response);
         }
