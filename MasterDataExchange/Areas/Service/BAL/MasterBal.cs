@@ -22,8 +22,7 @@ namespace DataExchange.Areas.Service.BAL
         private List<CustomResponse> _response;
         
         public MasterBal()
-        {
-            Data = new List<ModelParameter>();
+        {            
             _response = new List<CustomResponse>();
         }
 
@@ -34,6 +33,7 @@ namespace DataExchange.Areas.Service.BAL
             MccPlant MccModel = GetLastRecord<MccPlant>("tbl_mcc_plant");
             foreach (Bmc BmcModel in BmcList)
             {
+                Data = new List<ModelParameter>();
                 if (BmcModel.bmc_code != "")
                 {
                     Bmc NewModel = NewRepo.FindByKey<Bmc>(BmcModel.bmc_code);
@@ -95,6 +95,7 @@ namespace DataExchange.Areas.Service.BAL
             Unions UnionsModel = GetLastRecord<Unions>("tbl_unions");
             foreach (Route RouteModel in RouteList)
             {
+                Data = new List<ModelParameter>();
                 if (RouteModel.route_code != "")
                 {
                     Route NewModel = NewRepo.FindByKey<Route>(RouteModel.route_code);
@@ -139,6 +140,7 @@ namespace DataExchange.Areas.Service.BAL
             MccPlant MccPlantModel = GetLastRecord<MccPlant>("tbl_mcc_plant");
             foreach (Dcs DcsModel in DcsList)
             {
+                Data = new List<ModelParameter>();
                 if (DcsModel.dcs_code != "")
                 {
                     Dcs NewModel = NewRepo.FindByKey<Dcs>(DcsModel.dcs_code);
@@ -184,6 +186,7 @@ namespace DataExchange.Areas.Service.BAL
 
             foreach (Member MemberModel in MemberList)
             {
+                Data = new List<ModelParameter>();
                 if (MemberModel.member_unique_code.Trim() != "")
                 {
                     if (MemberModel.member_code.Length > 4)
@@ -223,6 +226,7 @@ namespace DataExchange.Areas.Service.BAL
             Unions UnionsModel = GetLastRecord<Unions>("tbl_unions");
             foreach (CustomerMaster CustomerMasterModel in CustomerMasterList)
             {
+                Data = new List<ModelParameter>();
                 if (CustomerMasterModel.customer_unique_code.Trim() != "")
                 {                   
                     CustomerMaster NewModel = NewRepo.Find<CustomerMaster>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", CustomerMasterModel.customer_unique_code) } });                    
@@ -266,6 +270,7 @@ namespace DataExchange.Areas.Service.BAL
             
             foreach (PurchaseRateApplicability PurchaseRateApplicabilityModel in PurchaseRateApplicabilityList)
             {
+                Data = new List<ModelParameter>();
                 if (PurchaseRateApplicabilityModel.module_name.ToLower() == "dcs" )
                 {
                     if(PurchaseRateApplicabilityModel.rate_for == "farmer_collection")
