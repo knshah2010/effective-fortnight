@@ -27,7 +27,7 @@ namespace Models
         public string x_col3 { get; set; }
         public string x_col4 { get; set; }
         public string x_col5 { get; set; }
-        public bool is_active { get; set; }
+        public bool is_active { get; set; } = true;
         public string ref_code { get; set; }
         [Computed]
         public string applicability_unique_code { get; set; }

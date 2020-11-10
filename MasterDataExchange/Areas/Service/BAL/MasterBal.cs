@@ -8,6 +8,7 @@ using Framework.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Org.BouncyCastle.Crypto.Engines;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -228,7 +229,20 @@ namespace DataExchange.Areas.Service.BAL
             foreach (CustomerMaster CustomerMasterModel in CustomerMasterList)
             {
                 Data = new List<ModelParameter>();
-                if (CustomerMasterModel.customer_unique_code.Trim() != "")
+
+                QueryParam Query = new QueryParam
+                {
+                    Fields = "*",
+                    Table = "tbl_customer_type",
+                    Where = new List<ConditionParameter>
+                    {
+                        Condition("customer_type",CustomerMasterModel.customer_type)
+                    }
+
+                };
+                CustomerType CustomerTypeModel = NewRepo.Find<CustomerType>(Query);
+                
+                if (CustomerMasterModel.customer_unique_code.Trim() != "" && (CustomerMasterModel.customer_code.Substring(0, 2) == CustomerTypeModel.code_prefix || CustomerMasterModel.customer_code.Substring(0, 1) == CustomerTypeModel.code_prefix || CustomerMasterModel.customer_type== "VENDOR"))
                 {                   
                     CustomerMaster NewModel = NewRepo.Find<CustomerMaster>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", CustomerMasterModel.customer_unique_code) } });                    
                     if (NewModel == null)
@@ -320,7 +334,7 @@ namespace DataExchange.Areas.Service.BAL
         }
         private string SetDcsXcol(int allow_multiple_milktype)
         {
-            if (allow_multiple_milktype == 1)
+            if (allow_multiple_milktype == 1 )
                 return "1#1";
             else if (allow_multiple_milktype == 2)
                 return "0#1";
@@ -330,6 +344,26 @@ namespace DataExchange.Areas.Service.BAL
                 return "0#0";
             return "";
         }
+
+        //private string CheckCustomerCode(string customer_type)
+        //{
+        //    QueryParam Query = new QueryParam
+        //    {
+        //        Fields = "*",
+        //        Table = "tbl_customer_type",
+        //        Where = new List<ConditionParameter>
+        //            {
+        //                Condition("customer_type",customer_type)
+        //            }
+        //    };
+        //    CustomerType CustomerTypeModel = NewRepo.Find<CustomerType>(Query);
+
+
+        //    if (CustomerTypeModel.customer_type== "VENDOR") { }
+                
+
+
+        //}
         public IActionResult Upload(IFormFile File)
         {            
             if (Path.GetExtension(File.FileName).ToLower()!=".csv")

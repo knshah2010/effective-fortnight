@@ -41,7 +41,7 @@ namespace Models
         public string x_col5 { get; set; }
         public string mobile_no { get; set; }
         [Computed]
-        public int allow_multiple_milktype { get; set; }
+        public int allow_multiple_milktype { get; set; } = 1;
         [Computed]
         public string customer_unique_code { get; set; }
         [Computed]
