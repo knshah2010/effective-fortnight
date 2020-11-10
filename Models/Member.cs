@@ -35,7 +35,7 @@ namespace Models
         public string ref_code { get; set; }
 
         [Computed]
-        public string client_code { get; set; }
+        public string member_unique_code { get; set; }
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
         public string originating_org_type { get; set; } = "portal";
