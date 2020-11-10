@@ -16,7 +16,7 @@ namespace Models
         [ExplicitKey]
         public string rate_app_code { get; set; }
         public int shift_code { get; set; }
-        public int is_download { get; set; }
+        public int is_download { get; set; } = 0;
         public DateTime wef_date { get; set; }
         public DateTime download_date_time { get; set; }
         public string union_code { get; set; }
