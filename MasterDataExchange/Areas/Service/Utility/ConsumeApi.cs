@@ -26,7 +26,7 @@ namespace DataExchange.Areas.Service.Utility
         }
         public async Task Call()
         {
-            JObject json = JObject.Parse(FileHelper.ReadFile(FileHelper.ProjectPath()+ "Areas\\Service\\Config\\ApiConfig.json"));
+            JObject json = JObject.Parse(FileHelper.ReadFile(FileHelper.ProjectPath()+ "Areas/Service/Config/ApiConfig.json"));
             _Config = json.SelectToken(_token).ToObject<ApiConfig>();
             GetData();
             var request = new HttpRequestMessage(HttpMethod.Post, _Config.url);
