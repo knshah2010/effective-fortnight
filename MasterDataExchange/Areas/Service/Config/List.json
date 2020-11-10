@@ -1,7 +1,7 @@
 {
   "milk_collection": {
     "table": "tbl_milk_collection",
-    "fields": "milk_collection_code,shift_code,tbl_animal_type.short_name as milk_type,qty,fat,snf,rtpl,amount,sample_no",
+    "fields": "milk_collection_code,tbl_milk_collection.dcs_code,ex_member_code as member_code,ref_code as member_unique_code,date_time_of_collection as collection_date,UPPER(tbl_shift.short_name) as shift,UPPER(tbl_animal_type.short_name) as milk_type,fat,snf,rtpl,qty,amount,sample_no",
     "join": [
       {
         "table": "tbl_shift",
@@ -10,31 +10,36 @@
       {
         "table": "tbl_animal_type",
         "condition": "tbl_animal_type.animal_type_code=tbl_milk_collection.milk_type_code"
+      },
+      {
+        "table": "tbl_member",
+        "condition": "tbl_member.member_code=tbl_milk_collection.member_code"
       }
     ],
     "where": [
       {
         "propertyname": "data_post_status",
         "propertyvalue": "0"
-      },
-      {
-        "propertyname": "from_date",
-        "actualproperty": "date_time_of_collection",
-        "operator": "between"
-      },
-      {
-        "propertyname": "to_date",
-        "actualproperty": "date_time_of_collection",
-        "operator": "between"
       }
+      //,
+      //{
+      //  "propertyname": "from_date",
+      //  "actualproperty": "date_time_of_collection",
+      //  "operator": "between"
+      //},
+      //{
+      //  "propertyname": "to_date",
+      //  "actualproperty": "date_time_of_collection",
+      //  "operator": "between"
+      //}
     ],
-    "require": "bmc_code,from_date,to_date",
+    "require": "bmc_code",
     "direct_list": "true"
   },
 
   "rmrd_collection": {
     "table": "tbl_bmc_collection",
-    "fields": "milk_collection_code,shift_code,tbl_animal_type.short_name as milk_type,qty,fat,snf,rtpl,amount,sample_no",
+    "fields": "milk_collection_code,bmc_code,dcs_code,date_time_of_collection as collection_date,UPPER(tbl_shift.short_name) as shift,UPPER(tbl_animal_type.short_name) as milk_type,fat,snf,rtpl,qty,amount,sample_no",
     "join": [
       {
         "table": "tbl_shift",
