@@ -14,11 +14,11 @@ namespace DataExchange.Areas.Service.BAL
         public TransactionBal()
         {            
         }
-        public IActionResult SaveMilkAck(List<string> CollectionCodeList)
+        public IActionResult SaveMilkAck(List<CustomResponse> CollectionCodeList)
         {
-            foreach (string code in CollectionCodeList)
+            foreach (CustomResponse code in CollectionCodeList)
             {
-                MilkCollection collection = NewRepo.FindByKey<MilkCollection>(code);
+                MilkCollection collection = NewRepo.FindByKey<MilkCollection>(code.key_code);
                 if (collection!=null)
                 {
                     collection.data_post_status = 1;
@@ -33,11 +33,11 @@ namespace DataExchange.Areas.Service.BAL
             }
             return new CustomResult("success",new CustomResponse { status = "200", msg = "success" });
         }
-        public IActionResult SaveBmcAck(List<string> CollectionCodeList)
+        public IActionResult SaveBmcAck(List<CustomResponse> CollectionCodeList)
         {
-            foreach (string code in CollectionCodeList)
+            foreach (CustomResponse code in CollectionCodeList)
             {
-                BmcCollection collection = NewRepo.FindByKey<BmcCollection>(code);
+                BmcCollection collection = NewRepo.FindByKey<BmcCollection>(code.key_code);
                 if (collection != null)
                 {
                     collection.data_post_status = 1;

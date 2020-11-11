@@ -193,7 +193,26 @@ namespace DataExchange.Areas.Service.BAL
                     if (MemberModel.member_code.Length > 4)
                     {
                         return new CustomResult("success", new CustomResponse { status = "300", msg = "error:member_code:Max Length Should be 4" });
-                    }                                       
+                    }
+                    WelcomeParamStationResult _welcome = NewRepo.Find<WelcomeParamStationResult>(new QueryParam
+                    {
+                        Fields= "welcome_param_station_result.id,welcome_param_id,station_code,param_value",
+                        Join = new List<JoinParameter>
+                        {
+                            new JoinParameter{table="welcome_params",condition="welcome_params.id=welcome_param_id and param_name=\"NameFlag\""},
+                            new JoinParameter{table="tbl_dcs",condition="tbl_dcs.ref_code=welcome_param_station_result.station_code"}
+                        },
+                        Where = new List<ConditionParameter>
+                        {
+                            Condition("tbl_dcs.dcs_code",MemberModel.dcs_code)
+                        }
+                    });
+                    if (_welcome != null)
+                    {
+                        _welcome.model_operation = "update";
+                        _welcome.param_value = "Y";
+                        Data.Add(new ModelParameter { SaveModel = _welcome, ValidateModel = null });
+                    }
                     Member NewModel = NewRepo.Find<Member>(new QueryParam {Where=new List<ConditionParameter> { Condition("ref_code", MemberModel.member_unique_code) } });
                     if (NewModel == null)
                     {                        

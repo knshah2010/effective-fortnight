@@ -1,4 +1,5 @@
 ﻿using DataExchange.Areas.Service.BAL;
+using DataExchange.Areas.Service.Models;
 using Framework.Controllers;
 using Framework.Extension;
 using Microsoft.AspNetCore.Http;
@@ -36,14 +37,14 @@ namespace DataExchange.Areas.Service.Controllers
         public IActionResult Ack([FromBody] object data)
         {
             TransactionBal _bal = new TransactionBal();
-            return _bal.SaveMilkAck(data.ParseRequestList<string>());
+            return _bal.SaveMilkAck(data.ParseRequestList<CustomResponse>());
         }
         [HttpPost]
         [Route("bmccollection_ack")]
         public IActionResult BmcAck([FromBody] object data)
         {
             TransactionBal _bal = new TransactionBal();
-            return _bal.SaveMilkAck(data.ParseRequestList<string>());
+            return _bal.SaveMilkAck(data.ParseRequestList<CustomResponse>());
         }
 
     }
