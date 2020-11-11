@@ -379,7 +379,8 @@ namespace DataExchange.Areas.Service.BAL
 
         //}
         public IActionResult Upload(IFormFile File)
-        {            
+        {
+            Data = new List<ModelParameter>();
             if (Path.GetExtension(File.FileName).ToLower()!=".csv")
             {
                 return new CustomResult("success", new CustomResponse { key_code = "0", status = "300", msg = "error:Only Csv File Allowed" });                
@@ -415,7 +416,7 @@ namespace DataExchange.Areas.Service.BAL
             string tablename = NumericHelper.RandomNumber().ToString() + "tmp";
             NewRepo.Add(new QueryParam
             {
-                DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,fat decimal(18,2),snf decimal(18,2),milk_type varchar(5),rtpl decimal(18,2),milk_type_code int null); LOAD DATA LOCAL INFILE  '{ImportFileModel.new_file_path.Replace('\\','/')}' INTO TABLE {tablename} FIELDS TERMINATED BY ';'  IGNORE 1 ROWS (fat, snf,milk_type,rtpl); "
+                DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,fat decimal(18,2),snf decimal(18,2),milk_type varchar(5),rtpl decimal(18,2),class varchar(5) null,milk_type_code int null); LOAD DATA LOCAL INFILE  '{ImportFileModel.new_file_path.Replace('\\','/')}' INTO TABLE {tablename} FIELDS TERMINATED BY ';'  IGNORE 1 ROWS (fat,snf,milk_type,rtpl,class); "
             });
             NewRepo.FindAll(new QueryParam{
                 Sp= "import_rate",
