@@ -56,6 +56,7 @@ namespace Models
             RuleFor(d => d.customer_code).Require();
             RuleFor(d => d.customer_unique_code).Require();
             RuleFor(d => d.customer_name).Require();
+            RuleFor(d => d.customer_type).Require();
             RuleFor(d => d.is_active).Require();
             RuleFor(d => d.bmc_code).Require().CheckAvailable("tbl_bmc");
             RuleFor(d => d.route_code).Require().CheckAvailable("tbl_route");

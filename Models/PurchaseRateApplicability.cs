@@ -51,7 +51,7 @@ namespace Models
             
             RuleFor(e => e.module_name).Require();
             RuleFor(e => e.module_code).Require();
-
+            RuleFor(e => e.applicability_unique_code).Require();
             List<string> rate_for_condition = new List<string> { "farmer_collection", "rmrd_collection" };
             RuleFor(d => d.rate_for).Require().Must(d => rate_for_condition.Contains(d))
                     .WithMessage("Please only use: " + String.Join(",", rate_for_condition));

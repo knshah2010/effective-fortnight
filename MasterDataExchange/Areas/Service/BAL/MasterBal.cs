@@ -226,46 +226,49 @@ namespace DataExchange.Areas.Service.BAL
         public IActionResult SaveCustomer(List<CustomerMaster> CustomerMasterList)
         {
             Unions UnionsModel = GetLastRecord<Unions>("tbl_unions");
+            QueryParam Query = new QueryParam
+            {
+                Fields = "*",
+                Table = "tbl_customer_type" 
+            };
+            List<CustomerType> CustomerTypeList = NewRepo.FindAll<CustomerType>(Query).ToList();
             foreach (CustomerMaster CustomerMasterModel in CustomerMasterList)
             {
                 Data = new List<ModelParameter>();
-
-                QueryParam Query = new QueryParam
-                {
-                    Fields = "*",
-                    Table = "tbl_customer_type",
-                    Where = new List<ConditionParameter>
-                    {
-                        Condition("customer_type",CustomerMasterModel.customer_type)
-                    }
-
-                };
-                CustomerType CustomerTypeModel = NewRepo.Find<CustomerType>(Query);
                 
-                if (CustomerMasterModel.customer_unique_code.Trim() != "" && (CustomerMasterModel.customer_code.Substring(0, 2) == CustomerTypeModel.code_prefix || CustomerMasterModel.customer_code.Substring(0, 1) == CustomerTypeModel.code_prefix || CustomerMasterModel.customer_type== "VENDOR"))
-                {                   
-                    CustomerMaster NewModel = NewRepo.Find<CustomerMaster>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", CustomerMasterModel.customer_unique_code) } });                    
-                    if (NewModel == null)
+                if (CustomerMasterModel.customer_unique_code.Trim() != "" )
+                {
+                    string prefix = CustomerTypeList.Where(x => x.customer_type == CustomerMasterModel.customer_type).Select(x=>x.code_prefix).FirstOrDefault();
+                    if (CheckPrefix(prefix, CustomerMasterModel.customer_code))
                     {
-                        CustomerMasterModel.ref_code = CustomerMasterModel.customer_unique_code;
-                        CustomerMasterModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
-                        CustomerMasterModel.originating_org_code = CustomerMasterModel.union_code = UnionsModel.union_code;                        
-                        Data.Add(new ModelParameter { SaveModel = CustomerMasterModel, ValidateModel = new CustomerMasterValidator() });
+                        CustomerMaster NewModel = NewRepo.Find<CustomerMaster>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", CustomerMasterModel.customer_unique_code) } });
+                        if (NewModel == null)
+                        {
+                            CustomerMasterModel.ref_code = CustomerMasterModel.customer_unique_code;
+                            CustomerMasterModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
+                            CustomerMasterModel.originating_org_code = CustomerMasterModel.union_code = UnionsModel.union_code;
+                            Data.Add(new ModelParameter { SaveModel = CustomerMasterModel, ValidateModel = new CustomerMasterValidator() });
+                        }
+                        else
+                        {
+                            NewModel.customer_unique_code = CustomerMasterModel.customer_unique_code;
+                            NewModel.bmc_code = CustomerMasterModel.bmc_code;
+                            NewModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
+                            NewModel.route_code = CustomerMasterModel.route_code;
+                            NewModel.customer_name = CustomerMasterModel.customer_name;
+                            NewModel.is_active = CustomerMasterModel.is_active;
+                            NewModel.mobile_no = CustomerMasterModel.mobile_no;
+                            NewModel.customer_type = CustomerMasterModel.customer_type;
+                            NewModel.model_operation = "update";
+                            Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new CustomerMasterValidator() });
+                        }
+                        SaveData(CustomerMasterModel.customer_unique_code);
                     }
                     else
                     {
-                        NewModel.customer_unique_code = CustomerMasterModel.customer_unique_code;
-                        NewModel.bmc_code = CustomerMasterModel.bmc_code;
-                        NewModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
-                        NewModel.route_code = CustomerMasterModel.route_code;
-                        NewModel.customer_name = CustomerMasterModel.customer_name;
-                        NewModel.is_active = CustomerMasterModel.is_active;
-                        NewModel.mobile_no = CustomerMasterModel.mobile_no;
-                        NewModel.customer_type = CustomerMasterModel.customer_type;
-                        NewModel.model_operation = "update";
-                        Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new CustomerMasterValidator() });
+                        _response.Add(new CustomResponse { status = "300", msg = "error:customer_code:Invalid Code" });
                     }
-                    SaveData(CustomerMasterModel.customer_unique_code);
+                    
                 }
                 else
                 {
@@ -274,7 +277,18 @@ namespace DataExchange.Areas.Service.BAL
             }
             return new CustomResult("success", _response);
         }
-
+        private bool CheckPrefix(string prefix,string code)
+        {
+            if (prefix == null || prefix.Trim() == "")
+                return true;
+            else
+            {
+                if (code.Substring(0, prefix.Length) == prefix)
+                    return true;
+                else
+                    return false;
+            }
+        }
 
         public IActionResult PurchaseRateApplicability(List<PurchaseRateApplicability> PurchaseRateApplicabilityList)
         {
