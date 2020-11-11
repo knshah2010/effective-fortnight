@@ -58,5 +58,71 @@
     ],
     "require": "bmc_code,date_time_of_collection",
     "direct_list": "true"
+  },
+
+  "bmc": {
+    "table": "tbl_bmc",
+    "fields": "bmc_code,bmc_name,bmc_incharge_name,contact_no,is_active",
+    "direct_list": "true"
+  },
+
+  "route": {
+    "table": "tbl_route",
+    "fields": "route_code,route_name,to_dest as bmc_code,bmc_name,route_type,route_supervisor_name,tbl_route.contact_no,tbl_route.is_active",
+    "join": [
+      {
+        "table": "tbl_bmc",
+        "condition": "tbl_bmc.bmc_code=tbl_route.to_dest"
+      }
+    ],
+    "direct_list": "true"
+  },
+
+  "dcs": {
+    "table": "tbl_dcs as d",
+    "fields": "dcs_code,dcs_name,d.bmc_code,bmc_name,d.route_code,route_name,contact_person,mobile_no,d.is_active",
+    "join": [
+      {
+        "table": "tbl_bmc",
+        "condition": "tbl_bmc.bmc_code=d.bmc_code"
+      },
+      {
+        "table": "tbl_route",
+        "condition": "d.route_code=tbl_route.route_code"
+      }
+    ],
+    "direct_list": "true"
+  },
+
+  "member": {
+    "table": "tbl_member as m",
+    "fields": "member_code,member_name,m.dcs_code,dcs_name,contact_person,m.mobile_no,rate_class,m.is_active",
+    "join": [
+      {
+        "table": "tbl_dcs",
+        "condition": "tbl_dcs.dcs_code=m.dcs_code"
+      }
+    ],
+    "direct_list": "true"
+  },
+
+  "customer": {
+    "table": "tbl_customer_master as c",
+    "fields": "customer_code,customer_name,c.mobile_no,customer_desc as customer_type,c.bmc_code,bmc_name,c.route_code,route_name,c.is_active",
+    "join": [
+      {
+        "table": "tbl_bmc",
+        "condition": "tbl_bmc.bmc_code=c.bmc_code"
+      },
+      {
+        "table": "tbl_route",
+        "condition": "c.route_code=tbl_route.route_code"
+      },
+      {
+        "table": "tbl_customer_type",
+        "condition": "tbl_customer_type.customer_type=c.customer_type"
+      }
+    ],
+    "direct_list": "true"
   }
 }
