@@ -437,7 +437,7 @@ namespace DataExchange.Areas.Service.BAL
             {
                 DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,fat decimal(18,2),snf decimal(18,2),milk_type varchar(5),rtpl decimal(18,2),class varchar(5) null,milk_type_code int null); LOAD DATA LOCAL INFILE  '{ImportFileModel.new_file_path.Replace('\\','/')}' INTO TABLE {tablename} FIELDS TERMINATED BY ';'  IGNORE 1 ROWS (fat,snf,milk_type,rtpl,class); "
             });
-            NewRepo.FindAll(new QueryParam{
+            int value=NewRepo.Find<int>(new QueryParam{
                 Sp= "import_rate",
                 Where=new List<ConditionParameter>
                 {
@@ -447,7 +447,15 @@ namespace DataExchange.Areas.Service.BAL
                     Condition("p_usercode",UserData.user_code),
                 }
             });
-            return new CustomResult("success");
+            if (value == 1)
+            {
+                return new CustomResult("success", new CustomResponse { key_code = param[0], status = "200", msg = "success" });
+            }
+            else
+            {
+                return new CustomResult("success", new CustomResponse { key_code = param[0], status = "300", msg = "error" });
+            }
+            
         }
 
     }
