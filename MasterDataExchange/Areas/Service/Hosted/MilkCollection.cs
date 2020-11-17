@@ -20,17 +20,17 @@ namespace DataExchange.Areas.Service.Hosted
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            this._timer = new Timer(ExecuteTask, null, TimeSpan.Zero,TimeSpan.FromMinutes(30));           
+            this._timer = new Timer(ExecuteTask, null, TimeSpan.Zero,TimeSpan.FromMinutes(1));           
             return Task.CompletedTask;
         }
 
-        public override async Task StopAsync(CancellationToken cancellationToken)
+        public override Task StopAsync(CancellationToken cancellationToken)
         {
             this._timer?.Change(Timeout.Infinite, 0);
-          //  return Task.CompletedTask;
+            return Task.CompletedTask;
 
         }
-        private async void ExecuteTask(object state)
+        private void ExecuteTask(object state)
         {
             _api.Call();
         }

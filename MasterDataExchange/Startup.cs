@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using DataExchange.Areas.Service.Hosted;
+using FluentValidation;
 using Framework.Extension;
 using Framework.Library.Filter;
 using Framework.Library.Validator;
@@ -35,6 +36,7 @@ namespace Test
                 config.DefaultApiVersion = new ApiVersion(1, 0);
                 config.AssumeDefaultVersionWhenUnspecified = true;
             });
+          //  services.AddHostedService<MilkCollection>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,6 +1,6 @@
 {
   "milk_collection": {
-    "url": "bmc_config",
+    "url": "http://prideofmp.in/everest-callback",   
     "sp": "proc_milkcollection_data",
     "table": "tbl_milk_collection",
     "field": "milk_collection_code",

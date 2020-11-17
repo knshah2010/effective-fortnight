@@ -1,5 +1,4 @@
 ﻿using DataExchange.Areas.Service.Models;
-using DataExchange.Areas.Service.Utility;
 using Framework.BAL;
 using Framework.CustomDataType;
 using Framework.Extension;
@@ -8,8 +7,6 @@ using Framework.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Org.BouncyCastle.Crypto.Engines;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

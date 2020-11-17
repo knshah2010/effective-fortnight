@@ -1,10 +1,13 @@
 ﻿using DataExchange.Areas.Service.Models;
 using Framework.CustomDataType;
 using Framework.DataAccess.Dapper;
+using Framework.Extension;
 using Framework.Library.Helper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -26,25 +29,39 @@ namespace DataExchange.Areas.Service.Utility
         }
         public async Task Call()
         {
-            JObject json = JObject.Parse(FileHelper.ReadFile(FileHelper.ProjectPath()+ "Areas/Service/Config/ApiConfig.json"));
-            _Config = json.SelectToken(_token).ToObject<ApiConfig>();
-            GetData();
-            var request = new HttpRequestMessage(HttpMethod.Post, _Config.url);
-            foreach (KeyValuePair<string, string> header in _Config.headers.NotEmpty())
+            try
             {
-                request.Headers.TryAddWithoutValidation(header.Key, header.Value);
-            }
-            request.Content = new StringContent(JsonConvert.SerializeObject(DataList), Encoding.UTF8, _Config.type);            
-            HttpResponseMessage result;
-            using (var client = new HttpClient())
-            {
-                result = await client.SendAsync(request);                
-                if (result.IsSuccessStatusCode)
+                JObject json = JObject.Parse(FileHelper.ReadFile(FileHelper.ProjectPath() + "MasterDataExchange/Areas/Service/Config/ApiConfig.json"));
+                _Config = json.SelectToken(_token).ToObject<ApiConfig>();
+                GetData();
+                if (DataList.Count()>0)
                 {
-                    var jsonString = await result.Content.ReadAsStringAsync();                    
-                    _responseList = JsonConvert.DeserializeObject<List<CustomResponse>>(jsonString);
-                    UpdateData();
+                    dynamic data = new ExpandoObject();
+                    data.data = DataList;
+                    var request = new HttpRequestMessage(HttpMethod.Post, _Config.url);
+                    foreach (KeyValuePair<string, string> header in _Config.headers.NotEmpty())
+                    {
+                        request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                    }                    
+                    request.Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, _Config.type);
+                    HttpResponseMessage result;
+                    using (var client = new HttpClient())
+                    {
+                        result = await client.SendAsync(request);
+                        if (result.IsSuccessStatusCode)
+                        {
+                            var jsonString = await result.Content.ReadAsStringAsync();
+                            object ResultData = JObject.Parse(jsonString);
+                            _responseList = ResultData.ParseRequestList<CustomResponse>();
+                            UpdateData();
+                        }
+                    }
                 }
+                
+            }
+            catch(Exception E)
+            {
+
             }
         }
         private void GetData()
@@ -91,7 +108,7 @@ namespace DataExchange.Areas.Service.Utility
     }
     class ApiConfig
     {
-        public string url { get; set; }        
+        public string url { get; set; }       
         public string sp { get; set; }         
         public string type { get; set; }
         public string table { get; set; }
