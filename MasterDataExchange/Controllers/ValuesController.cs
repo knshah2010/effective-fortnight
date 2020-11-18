@@ -10,6 +10,7 @@ using System.Dynamic;
 using Newtonsoft.Json.Linq;
 using Framework.DataAccess.Dapper;
 using Framework.Library.Helper;
+using DataExchange.Areas.Service.Utility;
 
 namespace Test.Controllers
 {
@@ -50,6 +51,14 @@ namespace Test.Controllers
                 DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,fat decimal(18,2),snf decimal(18,2),milk_type varchar(5),rtpl decimal(18,2),milk_type_code int null); LOAD DATA LOCAL INFILE  'O:/Roshani/Projects/DataExchangeAPI/FileServer/Import/Upload/rate_chart_comma_sqparated.csv' INTO TABLE {tablename} FIELDS TERMINATED BY ';'  IGNORE 1 ROWS (fat, snf,milk_type,rtpl); "
             });
             return null;
+        }
+
+        [HttpGet]
+        [Route("consume")]
+        public void consume()
+        {
+            ConsumeApi _api=new ConsumeApi("milk_collection");
+            _api.Call();
         }
 
         // GET api/values/5

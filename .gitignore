@@ -4,5 +4,13 @@ MasterDataExchange/obj/*
 MasterDataExchange/Properties/*
 Models/bin/*
 Models/obj/*
-DataExchangeApi.sln
+AndroidAmcu/bin/*
+AndroidAmcu/obj/*
+AndroidAmcu/Properties/*
+MasterDataExchange/DataExchange.csproj.user
+AndroidAmcu/AndroidAmcu.csproj.user
+!FileServer/
 FileServer/*
+!FileServer/Identity/
+FileServer/Identity/*
+!FileServer/Identity/Struct
