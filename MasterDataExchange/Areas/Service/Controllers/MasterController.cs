@@ -152,10 +152,10 @@ namespace DataExchange.Areas.Service.Controllers
 
         [HttpPost]
         [Route("rate")]
-        public IActionResult Create([FromForm] IFormFile File)
+        public IActionResult Create([FromForm] IFormFile File,[FromForm]int rate_type=0)
         {
             MasterBal _bal = new MasterBal();
-            return _bal.Upload(File);
+            return _bal.Upload(File, rate_type);
         }
     }
 }

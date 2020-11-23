@@ -24,5 +24,13 @@ namespace AndroidAmcu.Areas.Configuration.Controllers
             List<Sentbox> list=_listEngine.List<Sentbox>(_bal.PrepareData(data.ParseRequestWithoutData<RequestFormat1>()), FileName, "sentbox");
             return new CustomResult2(list);
         }
+
+        [HttpPost]
+        [Route("inbox")]
+        public IActionResult Inbox([FromBody] object data)
+        {
+            MasterDataBal _bal = new MasterDataBal();
+            return _bal.SaveInbox(data.ParseRequestWithoutData<RequestFormat3>());
+        }
     }
 }
