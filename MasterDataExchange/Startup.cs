@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Test
 {
@@ -29,8 +31,8 @@ namespace Test
                 config.Filters.Add(new AuthenticateFilter());
             }).AddNewtonsoftJson(opt => {
                 opt.SerializerSettings.Converters.Add(new MyDateTimeConvertor());
-
-            });
+               
+             });
             services.AddApiVersioning(config =>
             {
                 config.DefaultApiVersion = new ApiVersion(1, 0);

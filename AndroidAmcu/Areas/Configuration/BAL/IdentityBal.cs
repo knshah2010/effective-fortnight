@@ -42,7 +42,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                     AndroidInstallation InstalationModel = NewRepo.FindByColumn<AndroidInstallation>(new List<ConditionParameter>
                     {
                          Condition("organization_code",BmcModel.bmc_code),
-                         Condition("organization_type","bmc"),
+                         Condition("organization_type","BMC"),
                     });
 
                     if (InstalationModel == null)
@@ -51,7 +51,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                         {
                             android_installation_id = DbHelper.UniqueKey(),
                             organization_code = BmcModel.bmc_code,
-                            organization_type = "bmc",
+                            organization_type = "BMC",
                         };
                         DetailModel = SetDetail(InstalationModel.android_installation_id);
                         _data.Add(new ModelParameter { ValidateModel = null, SaveModel = InstalationModel });

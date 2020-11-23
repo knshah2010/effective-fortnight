@@ -26,9 +26,9 @@ namespace AndroidAmcu
             services.AddControllers(config =>
             {
                 config.Filters.Add(new AuthenticateFilter());
-            }).AddNewtonsoftJson(opt => {
-                opt.SerializerSettings.Converters.Add(new MyDateTimeConvertor());
-
+            }).AddNewtonsoftJson(opt =>
+            {
+                     opt.SerializerSettings.Converters.Add(new MyDateTimeConvertor());
             });
             services.AddApiVersioning(config =>
             {
