@@ -10,7 +10,6 @@ namespace Models
     [Table("tbl_bmc_milk_type")]
     public class BmcMilkType : BaseModel
     {
-        [Key]
         [ExplicitKey]
         public string bmc_code { get; set; }
         public int milk_type_code { get; set; }

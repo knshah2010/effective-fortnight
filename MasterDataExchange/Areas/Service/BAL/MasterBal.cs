@@ -54,13 +54,14 @@ namespace DataExchange.Areas.Service.BAL
                             };
                             MccPlantModel.union_code = MccPlantModel.originating_org_code = BmcModel.union_code;
                             Data.Add(new ModelParameter { SaveModel = MccPlantModel, ValidateModel = new MccPlantValidator() });
-                            SetBmcMilkType(BmcModel);
+                            
                         }
                         else
                         {
                             BmcModel.mcc_plant_code = MccModel.mcc_plant_code;
                         }
                         Data.Add(new ModelParameter { SaveModel = BmcModel, ValidateModel = new BmcValidator() });
+                        SetBmcMilkType(BmcModel);
                     }
                     else
                     {
@@ -155,6 +156,7 @@ namespace DataExchange.Areas.Service.BAL
                         DcsModel.plant_code = MccPlantModel.plant_code;
                         DcsModel.x_col1 = SetDcsXcol(DcsModel.allow_multiple_milktype);
                         Data.Add(new ModelParameter { SaveModel = DcsModel, ValidateModel = new DcsValidator() });
+                        SetDcsMilkType(DcsModel);
                     }
                     else
                     {
@@ -378,7 +380,6 @@ namespace DataExchange.Areas.Service.BAL
 
         private void SetBmcMilkType(Bmc BmcModel)
         {
-
             int milk_type = BmcModel.milk_type;
 
             int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 1, 3, 0 }, { 2, 3, 0 }, { 1, 2, 3 } };
@@ -387,10 +388,9 @@ namespace DataExchange.Areas.Service.BAL
             {
                 if (milk_type == i)
                 {
-
                     for (int j = 0; j < 3; j++)
                     {
-                        if (milkTypeArray[i, j] != 0)
+                        if (milkTypeArray[i - 1, j] != 0)
                         {
                             BmcMilkType BmcMilkTypeModel = new BmcMilkType();
                             BmcMilkTypeModel.bmc_code = BmcModel.bmc_code;
@@ -401,9 +401,33 @@ namespace DataExchange.Areas.Service.BAL
                     }
                 }
             }
-
-
         }
+
+        private void SetDcsMilkType(Dcs DcsModel)
+        {
+            int milk_type = DcsModel.milk_type;
+
+            int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 1, 3, 0 }, { 2, 3, 0 }, { 1, 2, 3 } };
+
+            for (int i = 1; i <= 7; i++)
+            {
+                if (milk_type == i)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (milkTypeArray[i - 1, j] != 0)
+                        {
+                            DcsMilkType DcsMilkTypeModel = new DcsMilkType();
+                            DcsMilkTypeModel.dcs_code = DcsModel.dcs_code;
+                            DcsMilkTypeModel.milk_type_code = milkTypeArray[i - 1, j];
+                            DcsMilkTypeModel.is_active = true;
+                            Data.Add(new ModelParameter() { ValidateModel = new DcsMilkTypeValidator(), SaveModel = DcsMilkTypeModel });
+                        }
+                    }
+                }
+            }
+        }
+
         //private string CheckCustomerCode(string customer_type)
         //{
         //    QueryParam Query = new QueryParam
