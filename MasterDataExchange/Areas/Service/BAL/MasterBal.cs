@@ -382,7 +382,7 @@ namespace DataExchange.Areas.Service.BAL
         {
             int milk_type = BmcModel.milk_type;
 
-            int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 1, 3, 0 }, { 2, 3, 0 }, { 1, 2, 3 } };
+            int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 2, 3, 0 }, { 1, 3, 0 }, { 1, 2, 3 } };
 
             for (int i = 1; i <= 7; i++)
             {
@@ -407,7 +407,7 @@ namespace DataExchange.Areas.Service.BAL
         {
             int milk_type = DcsModel.milk_type;
 
-            int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 1, 3, 0 }, { 2, 3, 0 }, { 1, 2, 3 } };
+            int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 2, 3, 0 }, { 1, 3, 0 }, { 1, 2, 3 } };
 
             for (int i = 1; i <= 7; i++)
             {
