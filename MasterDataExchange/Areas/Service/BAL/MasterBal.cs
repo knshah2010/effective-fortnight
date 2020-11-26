@@ -15,12 +15,12 @@ namespace DataExchange.Areas.Service.BAL
 {
     public class MasterBal : BaseBal<BaseModel>
     {
-        private string result = "";        
+        private string result = "";
         private List<ModelParameter> Data;
         private List<CustomResponse> _response;
-        
+
         public MasterBal()
-        {            
+        {
             _response = new List<CustomResponse>();
         }
 
@@ -38,7 +38,7 @@ namespace DataExchange.Areas.Service.BAL
                     if (NewModel == null)
                     {
                         BmcModel.ref_code = BmcModel.bmc_code;
-                        BmcModel.union_code = BmcModel.originating_org_code=UnionsModel.union_code;                        
+                        BmcModel.union_code = BmcModel.originating_org_code = UnionsModel.union_code;
                         BmcModel.plant_code = PlantModel.plant_code;
                         if (UnionsModel.has_bmc == true && UnionsModel.has_mcc == false)
                         {
@@ -48,30 +48,32 @@ namespace DataExchange.Areas.Service.BAL
                                 mcc_plant_code = BmcModel.bmc_code,
                                 plant_code = PlantModel.plant_code,
                                 name = BmcModel.bmc_name,
-                                ref_code=BmcModel.ref_code,
-                                contact_person= BmcModel.bmc_incharge_name,
-                                mobile_no= BmcModel.contact_no
+                                ref_code = BmcModel.ref_code,
+                                contact_person = BmcModel.bmc_incharge_name,
+                                mobile_no = BmcModel.contact_no
                             };
-                            MccPlantModel.union_code = MccPlantModel.originating_org_code = BmcModel.union_code;                                                     
+                            MccPlantModel.union_code = MccPlantModel.originating_org_code = BmcModel.union_code;
                             Data.Add(new ModelParameter { SaveModel = MccPlantModel, ValidateModel = new MccPlantValidator() });
+                            
                         }
                         else
                         {
                             BmcModel.mcc_plant_code = MccModel.mcc_plant_code;
                         }
                         Data.Add(new ModelParameter { SaveModel = BmcModel, ValidateModel = new BmcValidator() });
+                        SetBmcMilkType(BmcModel);
                     }
                     else
                     {
                         if (UnionsModel.has_bmc == true && UnionsModel.has_mcc == false)
-                        {                            
+                        {
                             MccPlant MccPlantModel = NewRepo.FindByKey<MccPlant>(BmcModel.bmc_code);
                             MccPlantModel.name = BmcModel.bmc_name;
                             MccPlantModel.contact_person = BmcModel.bmc_incharge_name;
                             MccPlantModel.mobile_no = BmcModel.contact_no;
                             MccPlantModel.model_operation = "update";
                             Data.Add(new ModelParameter { SaveModel = MccPlantModel, ValidateModel = new MccPlantValidator() });
-                        }                        
+                        }
                         NewModel.bmc_name = BmcModel.bmc_name;
                         NewModel.is_active = BmcModel.is_active;
                         NewModel.bmc_incharge_name = BmcModel.bmc_incharge_name;
@@ -83,11 +85,11 @@ namespace DataExchange.Areas.Service.BAL
                 }
                 else
                 {
-                    _response.Add(new CustomResponse {status = "300", msg = "error:bmc_code" });
-                }                
+                    _response.Add(new CustomResponse { status = "300", msg = "error:bmc_code" });
+                }
             }
-            return new CustomResult("success",_response);
-        }        
+            return new CustomResult("success", _response);
+        }
         public IActionResult SaveRoute(List<Route> RouteList)
         {
             Unions UnionsModel = GetLastRecord<Unions>("tbl_unions");
@@ -102,12 +104,12 @@ namespace DataExchange.Areas.Service.BAL
                         RouteModel.route_type = "Can";
                     }
                     if (NewModel == null)
-                    {   
+                    {
                         RouteModel.vehicle_type_code = (RouteModel.route_type == "Can") ? 1 : 2;
                         RouteModel.to_dest = RouteModel.bmc_code;
                         RouteModel.to_type = "bmc";
                         RouteModel.ref_code = RouteModel.route_code;
-                        RouteModel.union_code= RouteModel.originating_org_code = UnionsModel.union_code  ;                       
+                        RouteModel.union_code = RouteModel.originating_org_code = UnionsModel.union_code;
                         Data.Add(new ModelParameter { SaveModel = RouteModel, ValidateModel = new RouteValidator() });
                     }
                     else
@@ -147,16 +149,17 @@ namespace DataExchange.Areas.Service.BAL
                         if (UnionsModel.has_mcc == true)
                             DcsModel.mcc_plant_code = MccPlantModel.mcc_plant_code;
                         else
-                            DcsModel.mcc_plant_code = DcsModel.bmc_code;                   
+                            DcsModel.mcc_plant_code = DcsModel.bmc_code;
 
-                        DcsModel.ref_code = DcsModel.dcs_code.PadLeft(15,'0');
-                        DcsModel.originating_org_code =DcsModel.union_code= MccPlantModel.union_code;
+                        DcsModel.ref_code = DcsModel.dcs_code.PadLeft(15, '0');
+                        DcsModel.originating_org_code = DcsModel.union_code = MccPlantModel.union_code;
                         DcsModel.plant_code = MccPlantModel.plant_code;
                         DcsModel.x_col1 = SetDcsXcol(DcsModel.allow_multiple_milktype);
                         Data.Add(new ModelParameter { SaveModel = DcsModel, ValidateModel = new DcsValidator() });
+                        SetDcsMilkType(DcsModel);
                     }
                     else
-                    {                      
+                    {
                         NewModel.dcs_name = DcsModel.dcs_name;
                         NewModel.bmc_code = DcsModel.bmc_code;
                         NewModel.route_code = DcsModel.route_code;
@@ -193,7 +196,7 @@ namespace DataExchange.Areas.Service.BAL
                     }
                     WelcomeParamStationResult _welcome = NewRepo.Find<WelcomeParamStationResult>(new QueryParam
                     {
-                        Fields= "welcome_param_station_result.id,welcome_param_id,station_code,param_value",
+                        Fields = "welcome_param_station_result.id,welcome_param_id,station_code,param_value",
                         Join = new List<JoinParameter>
                         {
                             new JoinParameter{table="welcome_params",condition="welcome_params.id=welcome_param_id and param_name=\"NameFlag\""},
@@ -210,13 +213,13 @@ namespace DataExchange.Areas.Service.BAL
                         _welcome.param_value = "Y";
                         Data.Add(new ModelParameter { SaveModel = _welcome, ValidateModel = null });
                     }
-                    Member NewModel = NewRepo.Find<Member>(new QueryParam {Where=new List<ConditionParameter> { Condition("ref_code", MemberModel.member_unique_code) } });
+                    Member NewModel = NewRepo.Find<Member>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", MemberModel.member_unique_code) } });
                     if (NewModel == null)
-                    {                        
+                    {
                         MemberModel.ex_member_code = MemberModel.member_code;
                         MemberModel.member_code = MemberModel.dcs_code + MemberModel.member_code.PadLeft(4, '0');
                         MemberModel.originating_org_code = UnionsModel.union_code;
-                        MemberModel.ref_code = MemberModel.member_unique_code;                        
+                        MemberModel.ref_code = MemberModel.member_unique_code;
                         Data.Add(new ModelParameter { SaveModel = MemberModel, ValidateModel = new MemberValidator() });
                     }
                     else
@@ -245,16 +248,16 @@ namespace DataExchange.Areas.Service.BAL
             QueryParam Query = new QueryParam
             {
                 Fields = "*",
-                Table = "tbl_customer_type" 
+                Table = "tbl_customer_type"
             };
             List<CustomerType> CustomerTypeList = NewRepo.FindAll<CustomerType>(Query).ToList();
             foreach (CustomerMaster CustomerMasterModel in CustomerMasterList)
             {
                 Data = new List<ModelParameter>();
-                
-                if (CustomerMasterModel.customer_unique_code.Trim() != "" )
+
+                if (CustomerMasterModel.customer_unique_code.Trim() != "")
                 {
-                    string prefix = CustomerTypeList.Where(x => x.customer_type == CustomerMasterModel.customer_type).Select(x=>x.code_prefix).FirstOrDefault();
+                    string prefix = CustomerTypeList.Where(x => x.customer_type == CustomerMasterModel.customer_type).Select(x => x.code_prefix).FirstOrDefault();
                     if (CheckPrefix(prefix, CustomerMasterModel.customer_code))
                     {
                         CustomerMaster NewModel = NewRepo.Find<CustomerMaster>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", CustomerMasterModel.customer_unique_code) } });
@@ -284,7 +287,7 @@ namespace DataExchange.Areas.Service.BAL
                     {
                         _response.Add(new CustomResponse { status = "300", msg = "error:customer_code:Invalid Code" });
                     }
-                    
+
                 }
                 else
                 {
@@ -293,7 +296,7 @@ namespace DataExchange.Areas.Service.BAL
             }
             return new CustomResult("success", _response);
         }
-        private bool CheckPrefix(string prefix,string code)
+        private bool CheckPrefix(string prefix, string code)
         {
             if (prefix == null || prefix.Trim() == "")
                 return true;
@@ -311,29 +314,29 @@ namespace DataExchange.Areas.Service.BAL
             Unions UnionsModel = GetLastRecord<Unions>("tbl_unions");
             QueryParam Query = new QueryParam
             {
-                Fields = "*"                
+                Fields = "*"
             };
-            IEnumerable<Shift> shiftList = NewRepo.FindAll<Shift>(Query);            
+            IEnumerable<Shift> shiftList = NewRepo.FindAll<Shift>(Query);
             int code = NewRepo.Find<int>(new QueryParam { DirectQuery = "select IFNULL(max(rate_app_code),0) from tbl_purchase_rate_applicability" });
-            
+
             foreach (PurchaseRateApplicability PurchaseRateApplicabilityModel in PurchaseRateApplicabilityList)
             {
                 Data = new List<ModelParameter>();
-                if (PurchaseRateApplicabilityModel.module_name.ToLower() == "dcs" )
+                if (PurchaseRateApplicabilityModel.module_name.ToLower() == "dcs")
                 {
-                    if(PurchaseRateApplicabilityModel.rate_for == "farmer_collection")
+                    if (PurchaseRateApplicabilityModel.rate_for == "farmer_collection")
                     {
                         PurchaseRateApplicabilityModel.rate_app_code = (code + 1).ToString();
                         PurchaseRateApplicabilityModel.ref_code = PurchaseRateApplicabilityModel.applicability_unique_code;
                         PurchaseRateApplicabilityModel.originating_org_code = PurchaseRateApplicabilityModel.union_code = UnionsModel.union_code;
                         PurchaseRateApplicabilityModel.dcs_code = PurchaseRateApplicabilityModel.module_code;
                         PurchaseRateApplicabilityModel.shift_code = shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.id).FirstOrDefault();
-                        string time= PurchaseRateApplicabilityModel.wef_date.ToString("yyyy-MM-dd")+" "+ shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.shift_time.ToString(@"hh\:mm\:ss")).FirstOrDefault();
+                        string time = PurchaseRateApplicabilityModel.wef_date.ToString("yyyy-MM-dd") + " " + shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.shift_time.ToString(@"hh\:mm\:ss")).FirstOrDefault();
                         PurchaseRateApplicabilityModel.wef_date = DateHelper.ParseDate(time);
                         Data.Add(new ModelParameter { SaveModel = PurchaseRateApplicabilityModel, ValidateModel = new PurchaseRateApplicabilityValidator() });
                         SaveData(PurchaseRateApplicabilityModel.applicability_unique_code);
                     }
-                    
+
                 }
             }
             return new CustomResult("success", _response);
@@ -350,7 +353,7 @@ namespace DataExchange.Areas.Service.BAL
             {
                 _response.Add(new CustomResponse { key_code = code, status = "300", msg = result });
             }
-        }     
+        }
 
         private T GetLastRecord<T>(string table) where T : BaseModel
         {
@@ -358,13 +361,13 @@ namespace DataExchange.Areas.Service.BAL
             {
                 Fields = "*",
                 Table = table,
-                OrderBy="created_at desc"
+                OrderBy = "created_at desc"
             };
             return NewRepo.Find<T>(Query);
         }
         private string SetDcsXcol(int allow_multiple_milktype)
         {
-            if (allow_multiple_milktype == 1 )
+            if (allow_multiple_milktype == 1)
                 return "1#1";
             else if (allow_multiple_milktype == 2)
                 return "0#1";
@@ -373,6 +376,56 @@ namespace DataExchange.Areas.Service.BAL
             else if (allow_multiple_milktype == 4)
                 return "0#0";
             return "";
+        }
+
+        private void SetBmcMilkType(Bmc BmcModel)
+        {
+            int milk_type = BmcModel.milk_type;
+
+            int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 2, 3, 0 }, { 1, 3, 0 }, { 1, 2, 3 } };
+
+            for (int i = 1; i <= 7; i++)
+            {
+                if (milk_type == i)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (milkTypeArray[i - 1, j] != 0)
+                        {
+                            BmcMilkType BmcMilkTypeModel = new BmcMilkType();
+                            BmcMilkTypeModel.bmc_code = BmcModel.bmc_code;
+                            BmcMilkTypeModel.milk_type_code = milkTypeArray[i - 1, j];
+                            BmcMilkTypeModel.is_active = true;
+                            Data.Add(new ModelParameter() { ValidateModel = new BmcMilkTypeValidator(), SaveModel = BmcMilkTypeModel });
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SetDcsMilkType(Dcs DcsModel)
+        {
+            int milk_type = DcsModel.milk_type;
+
+            int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 2, 3, 0 }, { 1, 3, 0 }, { 1, 2, 3 } };
+
+            for (int i = 1; i <= 7; i++)
+            {
+                if (milk_type == i)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (milkTypeArray[i - 1, j] != 0)
+                        {
+                            DcsMilkType DcsMilkTypeModel = new DcsMilkType();
+                            DcsMilkTypeModel.dcs_code = DcsModel.dcs_code;
+                            DcsMilkTypeModel.milk_type_code = milkTypeArray[i - 1, j];
+                            DcsMilkTypeModel.is_active = true;
+                            Data.Add(new ModelParameter() { ValidateModel = new DcsMilkTypeValidator(), SaveModel = DcsMilkTypeModel });
+                        }
+                    }
+                }
+            }
         }
 
         //private string CheckCustomerCode(string customer_type)
@@ -390,24 +443,24 @@ namespace DataExchange.Areas.Service.BAL
 
 
         //    if (CustomerTypeModel.customer_type== "VENDOR") { }
-                
+
 
 
         //}
-        public IActionResult Upload(IFormFile File,int rate_type)
+        public IActionResult Upload(IFormFile File, int rate_type)
         {
             Data = new List<ModelParameter>();
-            if (Path.GetExtension(File.FileName).ToLower()!=".csv")
+            if (Path.GetExtension(File.FileName).ToLower() != ".csv")
             {
-                return new CustomResult("success", new CustomResponse { key_code = "0", status = "300", msg = "error:Only Csv File Allowed" });                
+                return new CustomResult("success", new CustomResponse { key_code = "0", status = "300", msg = "error:Only Csv File Allowed" });
             }
             string[] param = File.FileName.Split('_');
-            if (param.Count()!=2)
+            if (param.Count() != 2)
             {
-                return new CustomResult("success", new CustomResponse { key_code = "0", status = "300", msg = "error:Wrong FileName Format" });                
+                return new CustomResult("success", new CustomResponse { key_code = "0", status = "300", msg = "error:Wrong FileName Format" });
             }
             string DirectoryPath = FileHelper.FileServerPath();
-            FileHelper.CreateDirectory(FileHelper.FileServerPath());            
+            FileHelper.CreateDirectory(FileHelper.FileServerPath());
             ImportFile ImportFileModel = new ImportFile
             {
                 file_name = File.FileName,
@@ -420,18 +473,19 @@ namespace DataExchange.Areas.Service.BAL
                 File.CopyTo(fileStream);
                 SaveData(Data);
             }
-            string rate = NewRepo.Find<string>(new QueryParam { 
-                Fields="purchase_rate_code",
-                Table= "tbl_purchase_rate",
-                Where=new List<ConditionParameter> { Condition("purchase_rate_code", param[0].Trim()) }
+            string rate = NewRepo.Find<string>(new QueryParam
+            {
+                Fields = "purchase_rate_code",
+                Table = "tbl_purchase_rate",
+                Where = new List<ConditionParameter> { Condition("purchase_rate_code", param[0].Trim()) }
             });
-            if (rate==param[0].Trim())
+            if (rate == param[0].Trim())
             {
                 return new CustomResult("success", new CustomResponse { key_code = param[0], status = "300", msg = "error:Rate already Exist" });
             }
             string tablename = NumericHelper.RandomNumber().ToString() + "tmp";
             string DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,fat decimal(18,2),snf decimal(18,2),milk_type varchar(5),rtpl decimal(18,2),class varchar(5) null default '0',milk_type_code int null); LOAD DATA LOCAL INFILE  '{ImportFileModel.new_file_path.Replace('\\', '/')}' INTO TABLE {tablename}  FIELDS TERMINATED BY ';'  IGNORE 1 ROWS (fat,snf,milk_type,rtpl); ";
-            if (rate_type!=0)
+            if (rate_type != 0)
             {
                 DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,fat decimal(18,2),snf decimal(18,2),milk_type varchar(5),rtpl decimal(18,2),class varchar(5) null default '0',milk_type_code int null); LOAD DATA LOCAL INFILE  '{ImportFileModel.new_file_path.Replace('\\', '/')}' INTO TABLE {tablename} FIELDS TERMINATED BY ';'  IGNORE 1 ROWS (fat,snf,milk_type,rtpl,class); ";
             }
@@ -439,9 +493,10 @@ namespace DataExchange.Areas.Service.BAL
             {
                 DirectQuery = DirectQuery
             });
-            string value=NewRepo.Find<string>(new QueryParam{
-                Sp= "import_rate",
-                Where=new List<ConditionParameter>
+            string value = NewRepo.Find<string>(new QueryParam
+            {
+                Sp = "import_rate",
+                Where = new List<ConditionParameter>
                 {
                     Condition("p_rate_code",param[0].Trim()),
                     Condition("p_rate_date",$"{param[1].Substring(4,4)}-{param[1].Substring(2,2)}-{param[1].Substring(0,2)}"),
@@ -457,7 +512,7 @@ namespace DataExchange.Areas.Service.BAL
             {
                 return new CustomResult("success", new CustomResponse { key_code = param[0], status = "300", msg = "error" });
             }
-            
+
         }
 
     }

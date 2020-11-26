@@ -32,8 +32,11 @@ namespace Models
         public string x_col4 { get; set; }
         public string x_col5 { get; set; }
         public string bmc_incharge_name { get; set; }
+        public bool is_weight_manual { get; set; } = true;
+        public bool is_quality_manual { get; set; } = true;
         public string contact_no { get; set; }
-
+        [Computed]
+        public int milk_type { get; set; }
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
         public string originating_org_type { get; set; } = "portal";

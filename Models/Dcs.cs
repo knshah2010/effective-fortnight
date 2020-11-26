@@ -41,6 +41,8 @@ namespace Models
         public string originating_org_type { get; set; } = "portal";
         public string version_no { get; set; } = "V5.0_010520";
         [Computed]
+        public int milk_type { get; set; }
+        [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
         [Computed]
         public int allow_multiple_milktype { get; set; } = 1;
