@@ -7,6 +7,7 @@ using Framework.Extension;
 using Framework.Library.Helper;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -19,11 +20,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
         private QueryParam _query;
         private List<ModelParameter> _data;
         private RequestFormat1 _request;
-        private Dictionary<string, List<string>> Hierarchy;
-        public IdentityBal()
-        {
-            DBRepository Sqlite = new DBRepository(FileHelper.FileServerPath("Identity/Struct/everest_amcs.db"));
-        }
+        private Dictionary<string, List<string>> Hierarchy;       
         public IdentityBal(RequestFormat1 request)
         {
             _request = request;            
@@ -247,6 +244,86 @@ namespace AndroidAmcu.Areas.Configuration.BAL
             return new CustomResult2(null, "Authentication Failed.");
         }
 
+        public IActionResult StartUp()
+        {
+            dynamic data = new ExpandoObject();
+            AndriodInstallationBal _android = new AndriodInstallationBal();
+            IdentityStartup _startup = new IdentityStartup();
+            _startup.collectionConfig = new collectionConfigClass();
+            if (_android.CheckInstallation(_request.token, _request.deviceId, _request.organizationCode, _request.organizationType) > 0)
+            {
+                OrgDetail();
+                if (Hierarchy != null)
+                {
+                    if (_request.organizationType.ToLower().Trim() == "bmc")
+                    {
+                        //config object
+                        List<UnionConfigResult> _configResult = NewRepo.FindAll<UnionConfigResult>(new QueryParam { 
+                            Table= "tbl_union_config_result",
+                            Fields= "tbl_union_config_result.config_key,tbl_union_config_result.config_result_key",
+                            Join=new List<JoinParameter>
+                            {
+                                new JoinParameter{table="tbl_config",condition="tbl_config.config_code=tbl_union_config_result.config_code"},
+                            },
+                            Where=new List<ConditionParameter>
+                            {
+                                Condition("tbl_union_config_result.union_code",Hierarchy["union_code"]),
+                                Condition("tbl_config.config_for",_request.organizationType)
+                            }
+                        }).ToList();
+                        _startup.config = new Dictionary<string, dynamic>();
+                        foreach(UnionConfigResult result in _configResult)
+                        {
+                            _startup.config.Add(result.config_key,result.config_result_key);
+                        }
+                        _startup.config.Add("collectionBlock", false);
+                        _startup.config.Add("dcsBlock", false);
+                        _startup.config.Add("dispatchMandate", false);
+                       //  _startup.config.Add("", "");
+
+
+
+                        //$MappedMilkType = $model_data->tblBmcMilkType;
+                        List<BmcMilkType> milktypeList = NewRepo.FindAll<BmcMilkType>(new QueryParam{
+                            Fields= "milk_type_code,animal_type_name as milk_type_name",
+                            Table = "tbl_bmc_milk_type",
+                            Join = new List<JoinParameter>
+                            {
+                                new JoinParameter{table="tbl_animal_type",condition="animal_type_code=milk_type_code"}
+                            },
+                            Where = new List<ConditionParameter> { Condition("bmc_code", _request.organizationCode), Condition("tbl_bmc_milk_type.is_active", 1) }
+                        }).ToList();
+                        _startup.collectionConfig.allowedMilkType = new List<allowedMilkTypeClass>();
+                        _startup.collectionConfig.milkTypeRate = new List<milkTypeRateClass>();
+                        _startup.collectionConfig.collectionIncentiveDeduction = new List<collectionIncentiveDeductionClass>();
+                        foreach (BmcMilkType _type in milktypeList)
+                        {                            
+                            UnionRatechartRange _rateRange = NewRepo.FindByColumn<UnionRatechartRange>(new List<ConditionParameter> { Condition("union_code",_request.organizationCode), Condition("config_for",_request.organizationType) });
+                            _startup.collectionConfig.milkTypeRate.Add(new milkTypeRateClass {
+                                milkTypeCode = _type.milk_type_code,
+                                milkTypeName = _type.milk_type_name
+                            });
+                            _startup.collectionConfig.allowedMilkType.Add(new allowedMilkTypeClass { 
+                                milkTypeCode=_type.milk_type_code,
+                                milkTypeName=_type.milk_type_name
+                            });
+                            if (_rateRange != null)
+                            {
+                                int key =_startup.collectionConfig.allowedMilkType.Count() - 1;
+                                _startup.collectionConfig.allowedMilkType[key].minFat = _rateRange.min_fat;
+                                _startup.collectionConfig.allowedMilkType[key].maxFat = _rateRange.max_fat;
+                                _startup.collectionConfig.allowedMilkType[key].minSnf = _rateRange.min_snf;
+                                _startup.collectionConfig.allowedMilkType[key].maxSnf = _rateRange.max_snf;
+                                _startup.collectionConfig.allowedMilkType[key].minClr = _rateRange.min_clr;
+                                _startup.collectionConfig.allowedMilkType[key].maxClr = _rateRange.max_clr;
+                            }
+                        }
+                    }
+                }
+            }
+            return new CustomResult2(_startup);
+        }
+
         private AndroidInstallationDetails SetDetail(string id)
         {
             return new AndroidInstallationDetails
@@ -269,7 +346,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                     Condition("bmc_code",_request.organizationCode)
                 }
             }).ToList();
-            if (OrgData == null)
+            if (OrgData == null || OrgData.Count()==0)
             {
                 Bmc BmcData = NewRepo.FindByKey<Bmc>(_request.organizationCode);
                 Hierarchy.Add("union_code", new List<string> { BmcData.union_code });
@@ -284,7 +361,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                 Hierarchy.Add("plant_code", new List<string> { OrgData.Select(x => x.plant_code).FirstOrDefault() });
                 Hierarchy.Add("mcc_plant_code", new List<string> { OrgData.Select(x => x.mcc_plant_code).FirstOrDefault() });
                 Hierarchy.Add("bmc_code", new List<string> { _request.organizationCode });
-                Hierarchy.Add("dcs_code", OrgData.Select(x => x.dcs_code).ToList());
+                Hierarchy.Add("dcs_code", OrgData.Select(x => x.dcs_code).ToList());             
             }              
         }
     }

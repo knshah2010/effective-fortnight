@@ -35,24 +35,8 @@ namespace AndroidAmcu.Areas.Configuration.BAL
         {
             string message = "Sentbox Not Updated.";
             dynamic data = new ExpandoObject();
-            string status = NewRepo.Find<string>(new QueryParam
-            {
-                Fields= "tbl_android_installation.android_installation_id",
-                Table = "tbl_android_installation_details",
-                Join = new List<JoinParameter>
-                {
-                    new JoinParameter{table="tbl_android_installation",condition="tbl_android_installation.android_installation_id=tbl_android_installation_details.android_installation_id"},
-                },
-                Where = new List<ConditionParameter> {
-                    Condition("hash_key",_requst.token),
-                    Condition("tbl_android_installation_details.is_active",1),
-                    Condition("is_expired",0),
-                    Condition("device_id",_requst.deviceId),
-                    Condition("tbl_android_installation.organization_code",_requst.organizationCode),
-                    Condition("organization_type",_requst.organizationType)
-                }
-            });
-            if (status.Trim() != "")
+            AndriodInstallationBal _android = new AndriodInstallationBal();           
+            if (_android.CheckInstallation(_requst.token, _requst.deviceId, _requst.organizationCode, _requst.organizationType)>0)
             {
                 bool flag=NewRepo.Delete(new List<QueryParam> {
                     new QueryParam
