@@ -32,5 +32,13 @@ namespace AndroidAmcu.Areas.Configuration.Controllers
             MasterDataBal _bal = new MasterDataBal();
             return _bal.SaveInbox(data.ParseRequestWithoutData<RequestFormat3>());
         }
+
+        [HttpPost]
+        [Route("sentbox-count")]
+        public IActionResult SentboxCount([FromBody] object data)
+        {
+            MasterDataBal _bal = new MasterDataBal();
+            return _bal.SentboxCount(data.ParseRequestWithoutData<RequestFormat1>());
+        }
     }
 }

@@ -97,5 +97,22 @@ namespace AndroidAmcu.Areas.Configuration.BAL
             data.errorId = string.Join(',', ErrorId);
             return new CustomResult2(data, message);
         }
+
+        public IActionResult SentboxCount(RequestFormat1 _requst)
+        {  
+            dynamic data = new ExpandoObject();
+            int cnt = NewRepo.Count<Sentbox>(new QueryParam
+            {
+                Where=new List<ConditionParameter>
+                {
+                    Condition("dest_org_id",_requst.organizationCode),
+                    Condition("dest_org_type",_requst.organizationType),
+                    Condition("device_id",_requst.deviceId),
+                    Condition("table_name",new string[]{"tbl_purchase_rate", "tbl_purchase_rate_based", "tbl_purchase_rate_details" }," Not In "),                   
+                }
+            });
+            data.count = cnt;
+            return new CustomResult2(data);
+        }
     }
 }
