@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +17,7 @@ namespace AndroidAmcu.Areas.Configuration.Models
         public bool memberDownload { get; set; } = false;
         public string welcomeMessage { get; set; } = "Welcome to Everest Instruments Pvt. Ltd.";
      //   public List<vendorTypeClass> vendorType { get; set; }
-        public List<string> shift_timing { get; set; }
+        public List<ShiftTime> shift_timing { get; set; }
         public string menuMapping { get; set; }
         public string isSurveyor { get; set; } = "0";
 
@@ -75,6 +77,7 @@ namespace AndroidAmcu.Areas.Configuration.Models
         public string ePurchaseRateCode { get; set; } = "";
         public string ePurchaseRateCodeBlock { get; set; } = "";
         public string memberApplicableRate { get; set; } = "";
+        public string bmcApplicableRate { get; set; } = "";
     }
     public class vendorTypeClass
     {
@@ -101,9 +104,9 @@ namespace AndroidAmcu.Areas.Configuration.Models
         public decimal rtpl { get; set; } = 0;
     }
     public class qualityParamClass{
-        public decimal fat { get; set; }
-        public decimal snf { get; set; }
-        public decimal clr { get; set; }
+        public decimal fat { get; set; } = 6.5M;
+        public decimal snf { get; set; } = 9.0M;
+        public decimal clr { get; set; } = 0.0M;
     }
     public class collectionIncentiveDeductionClass
     {
@@ -115,4 +118,22 @@ namespace AndroidAmcu.Areas.Configuration.Models
         public string fromDate { get; set; }
         public string toDate { get; set; }
     }
+
+    public class ShiftTime
+    {
+        [JsonProperty("collectionType")]
+        public string collection_type { get; set; }
+        [JsonProperty("mStartTime")]
+        public string m_start_time { get; set; }
+        [JsonProperty("eStartTime")]
+        public string e_start_time { get; set; }
+        [JsonProperty("mLockTime")]
+        public string m_lock_time { get; set; }
+        [JsonProperty("eLockTime")]
+        public string e_lock_time { get; set; }
+        [JsonProperty("dateShiftEnable")]
+        public string date_shift_enable { get; set; }
+        [JsonProperty("grace_hr")]
+        public string graceHr { get; set; }
+    }  
 }

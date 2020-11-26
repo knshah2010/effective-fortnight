@@ -10,6 +10,7 @@ using Models;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 
 namespace AndroidAmcu.Areas.Configuration.BAL
@@ -250,6 +251,9 @@ namespace AndroidAmcu.Areas.Configuration.BAL
             AndriodInstallationBal _android = new AndriodInstallationBal();
             IdentityStartup _startup = new IdentityStartup();
             _startup.collectionConfig = new collectionConfigClass();
+            _startup.shift_timing = new List<ShiftTime>();
+            _startup.rate = new rateClass();
+            bool is_member_rate = true;
             if (_android.CheckInstallation(_request.token, _request.deviceId, _request.organizationCode, _request.organizationType) > 0)
             {
                 OrgDetail();
@@ -274,7 +278,15 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                         _startup.config = new Dictionary<string, dynamic>();
                         foreach(UnionConfigResult result in _configResult)
                         {
-                            _startup.config.Add(result.config_key,result.config_result_key);
+                            if(result.config_key== "required_member_rate")
+                            {
+                                if (result.config_result_key == "0")
+                                    is_member_rate = false;
+                            }
+                            TextInfo txtInfo = new CultureInfo("en-us", false).TextInfo;
+                            string replace_key = txtInfo.ToTitleCase(result.config_key).Replace("_", string.Empty).Replace(" ", string.Empty);
+                            replace_key = $"{replace_key.First().ToString().ToLowerInvariant()}{replace_key.Substring(1)}";
+                            _startup.config.Add(replace_key, result.config_result_key);
                         }
                         _startup.config.Add("collectionBlock", false);
                         _startup.config.Add("dcsBlock", false);
@@ -296,6 +308,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                         _startup.collectionConfig.allowedMilkType = new List<allowedMilkTypeClass>();
                         _startup.collectionConfig.milkTypeRate = new List<milkTypeRateClass>();
                         _startup.collectionConfig.collectionIncentiveDeduction = new List<collectionIncentiveDeductionClass>();
+                        _startup.collectionConfig.qualityParam = new qualityParamClass();
                         foreach (BmcMilkType _type in milktypeList)
                         {                            
                             UnionRatechartRange _rateRange = NewRepo.FindByColumn<UnionRatechartRange>(new List<ConditionParameter> { Condition("union_code",_request.organizationCode), Condition("config_for",_request.organizationType) });
@@ -318,6 +331,77 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                                 _startup.collectionConfig.allowedMilkType[key].maxClr = _rateRange.max_clr;
                             }
                         }
+                        //quality param
+                        decimal[] quality_param = new decimal[3];                      
+                        quality_param[0] = 0.0M;  //clr
+                        quality_param[1] = 0.0M;  //ltrclr
+                        quality_param[2] = 0.0M;   //ltr2clr
+
+                        MilkCollectionConfig _milkConfig = NewRepo.FindByColumn<MilkCollectionConfig>(new List<ConditionParameter> { Condition("union_code", Hierarchy["union_code"]) });
+                        if (_milkConfig != null)
+                        {
+                            quality_param[1] = _milkConfig.lr1_for_clr;
+                            quality_param[2] = _milkConfig.lr2_for_clr;
+                        }
+
+                        quality_param[0] = (_startup.collectionConfig.qualityParam.fat - (_startup.collectionConfig.qualityParam.fat * quality_param[1]) - quality_param[2]) *4;
+                        quality_param[0] = quality_param[0] < 0 ? 0 : Math.Round(quality_param[0], 1);
+                        _startup.collectionConfig.qualityParam.clr = quality_param[0];
+                        //menu mapping
+                        List<string> _menuList = NewRepo.FindAll<string>(new QueryParam
+                        {
+                            Fields = "tbl_amcs_app_menu_mapping.action_name",
+                            Table = "tbl_amcs_app_menu_mapping",
+                            Join = new List<JoinParameter>
+                            {
+                                new JoinParameter{table="tbl_amcs_app_menu",condition="tbl_amcs_app_menu.action_code=tbl_amcs_app_menu_mapping.action_code"}
+                            },
+                            Where = new List<ConditionParameter>
+                            {
+                                Condition("application_type",_request.organizationType),
+                                Condition("union_code",Hierarchy["union_code"]),
+                                Condition("is_active",1),
+                            }
+                        }).ToList() ;
+                        _startup.menuMapping = string.Join(',', _menuList);
+
+                        //member rate
+                        if (is_member_rate)
+                        {
+                            _startup.rate.memberApplicableRate = string.Join(',', NewRepo.FindAll<string>(
+                                new QueryParam { Sp = "sp_app_amcu_v2_pending_rate_detail_member",
+                                Where=new List<ConditionParameter>{
+                                    Condition("p_dcs_code",string.Join(',',Hierarchy["dcs_code"])),
+                                    Condition("p_device_id",_request.deviceId),
+                                    Condition("p_hash_key",_request.token),
+                                }
+                                }).ToList());
+                            
+                        }
+                        _startup.rate.bmcApplicableRate = string.Join(',', NewRepo.FindAll<string>(
+                               new QueryParam
+                               {
+                                   Sp = "sp_app_amcu_v2_pending_rate_detail_bmc",
+                                   Where = new List<ConditionParameter>{
+                                    Condition("p_plant_code",string.Join(',',Hierarchy["plant_code"])),
+                                    Condition("p_mcc_plant_code",string.Join(',',Hierarchy["mcc_plant_code"])),
+                                    Condition("p_bmc_code",string.Join(',',Hierarchy["bmc_code"])),
+                                    Condition("p_dcs_code",string.Join(',',Hierarchy["dcs_code"])),
+                                    Condition("p_device_id",_request.deviceId),
+                                    Condition("p_hash_key",_request.token),
+                               }
+                               }).ToList());
+
+                        //shift time
+                        _startup.shift_timing = NewRepo.FindAll<ShiftTime>(
+                               new QueryParam
+                               {
+                                   Sp = "sp_app_amcu_v2_collection_shift_time",
+                                   Where = new List<ConditionParameter>{                                   
+                                    Condition("p_org_type",_request.organizationType),
+                                    Condition("p_org_code",_request.organizationCode),
+                               }
+                         }).ToList();                        
                     }
                 }
             }
