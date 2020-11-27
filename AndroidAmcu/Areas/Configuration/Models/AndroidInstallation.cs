@@ -9,8 +9,11 @@ namespace AndroidAmcu.Areas.Configuration.Models
     {
         [ExplicitKey]
         public string android_installation_id { get; set; }
+        public string application_installation_code { get; set; }
         public string organization_code { get; set; }
         public string organization_type { get; set; }
+        public string module_code { get; set; }
+        public string module_name { get; set; }
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
         [Computed]

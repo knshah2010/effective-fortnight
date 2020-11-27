@@ -34,6 +34,14 @@ namespace AndroidAmcu.Areas.Configuration.Controllers
         }
 
         [HttpPost]
+        [Route("acknowledgement")]
+        public IActionResult Acknowledgement([FromBody] object data)
+        {
+            MasterDataBal _bal = new MasterDataBal();
+            return _bal.SaveAck(data.ParseRequestWithoutData<Acknowledgemen>());
+        }
+
+        [HttpPost]
         [Route("sentbox-count")]
         public IActionResult SentboxCount([FromBody] object data)
         {

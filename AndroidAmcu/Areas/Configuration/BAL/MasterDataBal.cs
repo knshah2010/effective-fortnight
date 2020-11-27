@@ -41,7 +41,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                 bool flag=NewRepo.Delete(new List<QueryParam> {
                     new QueryParam
                     {
-                        Table="tbl_sentbox",
+                        Table="sentbox",
                         Where=new List<ConditionParameter>
                         {
                             Condition("uuid",_requst.content.uuid.ToArray())
@@ -108,7 +108,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                     Condition("dest_org_id",_requst.organizationCode),
                     Condition("dest_org_type",_requst.organizationType),
                     Condition("device_id",_requst.deviceId),
-                    Condition("table_name",new string[]{"tbl_purchase_rate", "tbl_purchase_rate_based", "tbl_purchase_rate_details" }," Not In "),                   
+                    Condition("table_names",new string[]{"tbl_purchase_rate", "tbl_purchase_rate_based", "tbl_purchase_rate_details" }," Not In "),                   
                 }
             });
             data.count = cnt;

@@ -1,4 +1,5 @@
 ﻿using AndroidAmcu.Areas.Configuration.Models;
+using AndroidAmcu.Areas.Configuration.Utility;
 using AndroidAmcu.Areas.General.Models;
 using Framework.BAL;
 using Framework.CustomDataType;
@@ -50,7 +51,10 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                             android_installation_id = DbHelper.UniqueKey(),
                             organization_code = BmcModel.bmc_code,
                             organization_type = "BMC",
+                            module_code= BmcModel.bmc_code,
+                            module_name= "BMC",
                         };
+                        InstalationModel.application_installation_code = InstalationModel.android_installation_id;
                         DetailModel = SetDetail(InstalationModel.android_installation_id);
                         _data.Add(new ModelParameter { ValidateModel = null, SaveModel = InstalationModel });
                     }
@@ -409,10 +413,11 @@ namespace AndroidAmcu.Areas.Configuration.BAL
         }
 
         private AndroidInstallationDetails SetDetail(string id)
-        {
+        {            
             return new AndroidInstallationDetails
             {
                 android_installation_id=id,
+                application_installation_code=id,
                 device_id=_request.deviceId,
                 imei_no= _request.imei,
                 mobile_no= _request.content.mobileNo,

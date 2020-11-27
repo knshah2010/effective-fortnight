@@ -6,7 +6,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace AndroidAmcu.Areas.Configuration.Models
 {
-    [Table("tbl_sentbox")]   
+    [Table("sentbox")]   
     public class Sentbox : BaseModel
     {
         [ExplicitKey]
@@ -24,7 +24,7 @@ namespace AndroidAmcu.Areas.Configuration.Models
         [JsonProperty("messageType")]
         public string message_type { get; set; }
         [JsonProperty("tableName")]
-        public string table_name { get; set; }
+        public string table_names { get; set; }
         [JsonProperty("operation")]
         public string operation { get; set; }
         [JsonProperty("jsonText")]

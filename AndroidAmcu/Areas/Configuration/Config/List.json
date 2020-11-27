@@ -1,10 +1,10 @@
 {
   "sentbox": {
-    "table": "tbl_sentbox",
-    "fields": "uuid,sync_status,source_org_type,source_org_id,dest_org_type,dest_org_id,message_type,table_name,operation,json_text,error_log,sequence_no,originating_org_id,originating_org_type,posting_timestamp,sync_timestamp,source_device_mac,version_no,device_id",
+    "table": "sentbox",
+    "fields": "uuid,sync_status,source_org_type,source_org_id,dest_org_type,dest_org_id,message_type,table_names as table_name,operation,json_text,error_log,sequence_no,originating_org_id,originating_org_type,posting_timestamp,sync_timestamp,source_device_mac,version_no,device_id",
     "where": [
       {
-        "propertyname": "table_name",
+        "propertyname": "table_names",
         "propertyvalue": [ "tbl_purchase_rate", "tbl_purchase_rate_based", "tbl_purchase_rate_details" ],
         "operator": " not in "
       }
