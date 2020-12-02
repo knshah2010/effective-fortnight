@@ -31,7 +31,7 @@ namespace DataExchange.Areas.Service.Utility
         {
             try
             {
-                JObject json = JObject.Parse(FileHelper.ReadFile(FileHelper.ProjectPath() + "MasterDataExchange/Areas/Service/Config/ApiConfig.json"));
+                JObject json = JObject.Parse(FileHelper.ReadFile(FileHelper.FullPath() + "Areas/Service/Config/ApiConfig.json"));
                 _Config = json.SelectToken(_token).ToObject<ApiConfig>();
                 GetData();
                 if (DataList.Count()>0)

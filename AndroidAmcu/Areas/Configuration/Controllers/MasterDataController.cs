@@ -48,5 +48,6 @@ namespace AndroidAmcu.Areas.Configuration.Controllers
             MasterDataBal _bal = new MasterDataBal();
             return _bal.SentboxCount(data.ParseRequestWithoutData<RequestFormat1>());
         }
+       
     }
 }
