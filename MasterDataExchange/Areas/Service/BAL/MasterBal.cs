@@ -37,6 +37,7 @@ namespace DataExchange.Areas.Service.BAL
                     Bmc NewModel = NewRepo.FindByKey<Bmc>(BmcModel.bmc_code);
                     if (NewModel == null)
                     {
+ 
                         BmcModel.ref_code = BmcModel.bmc_code;
                         BmcModel.union_code = BmcModel.originating_org_code = UnionsModel.union_code;
                         BmcModel.plant_code = PlantModel.plant_code;
@@ -60,6 +61,24 @@ namespace DataExchange.Areas.Service.BAL
                         {
                             BmcModel.mcc_plant_code = MccModel.mcc_plant_code;
                         }
+
+                        BmcSilosInfo BmcSilosInfoModel = new BmcSilosInfo();
+
+                        BmcSilosInfoModel.silo_no = "1";
+                        BmcSilosInfoModel.description = "Silo Mix";
+                        BmcSilosInfoModel.manufacturer_code = 1;
+                        BmcSilosInfoModel.storage_capacity = 3000;
+                        BmcSilosInfoModel.chilling_capacity = 3000;
+                        BmcSilosInfoModel.owning_type = "own";
+                        BmcSilosInfoModel.module_name = "BMC";
+                        BmcSilosInfoModel.module_code = BmcModel.bmc_code;
+                        BmcSilosInfoModel.bmc_code = BmcModel.bmc_code;
+                        BmcSilosInfoModel.milk_type_code = 3;
+                        BmcSilosInfoModel.union_code = UnionsModel.union_code;
+                        BmcSilosInfoModel.mcc_plant_code = BmcModel.bmc_code;
+                        BmcSilosInfoModel.wef_date= DateHelper.CurrentDate();
+
+                        Data.Add(new ModelParameter { SaveModel = BmcSilosInfoModel, ValidateModel = new BmcSilosInfoValidator() });
                         Data.Add(new ModelParameter { SaveModel = BmcModel, ValidateModel = new BmcValidator() });
                         SetBmcMilkType(BmcModel);
                     }
