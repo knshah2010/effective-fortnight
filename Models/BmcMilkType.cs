@@ -17,6 +17,8 @@ namespace Models
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
         public string originating_org_type { get; set; } = "portal";
+        [Computed]
+        public string milk_type_name { get; set; } = "N";
     }
 
     public class BmcMilkTypeValidator : AbstractValidator<BmcMilkType>

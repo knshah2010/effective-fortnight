@@ -6,11 +6,12 @@ namespace AndroidAmcu.Areas.Configuration.Models
 {
     [Table("tbl_android_installation_details")]
     public class AndroidInstallationDetails : BaseModel
-    {
+    {       
         [Key]
         [ExplicitKey]
         public int android_installation_details_id { get; set; }
         public string android_installation_id { get; set; }
+        public string application_installation_code { get; set; }
         public string mobile_no { get; set; }
         public int otp_code { get; set; }
         public string hash_key { get; set; }

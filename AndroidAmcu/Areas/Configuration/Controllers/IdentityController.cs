@@ -33,5 +33,13 @@ namespace AndroidAmcu.Areas.Configuration.Controllers
             IdentityBal _bal = new IdentityBal(data.ParseRequestWithoutData<RequestFormat1>());
             return _bal.Generate(Request.Host.Value);
         }
+
+        [HttpPost]
+        [Route("start-up")]
+        public IActionResult StartUp([FromBody] object data)
+        {
+            IdentityBal _bal = new IdentityBal(data.ParseRequestWithoutData<RequestFormat1>());
+            return _bal.StartUp();
+        }
     }
 }

@@ -38,7 +38,7 @@ namespace Test
                 config.DefaultApiVersion = new ApiVersion(1, 0);
                 config.AssumeDefaultVersionWhenUnspecified = true;
             });
-          //  services.AddHostedService<MilkCollection>();
+           // services.AddHostedService<MilkCollection>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
