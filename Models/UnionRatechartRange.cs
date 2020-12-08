@@ -1,6 +1,9 @@
-﻿namespace Models
+﻿using Dapper.Contrib.Extensions;
+
+namespace Models
 {
-    public class UnionRatechartRange
+    [Table("tbl_union_ratechart_range")]
+    public class UnionRatechartRange 
     {
         public int ratechart_range_code { get; set; }
         public int animal_type_code { get; set; }

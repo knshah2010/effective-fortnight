@@ -493,7 +493,7 @@ namespace DataExchange.Areas.Service.BAL
             {
                 DirectQuery = DirectQuery
             });
-            string value = NewRepo.Find<string>(new QueryParam
+            string  value = NewRepo.FindAll<string>(new QueryParam
             {
                 Sp = "import_rate",
                 Where = new List<ConditionParameter>
@@ -502,8 +502,9 @@ namespace DataExchange.Areas.Service.BAL
                     Condition("p_rate_date",$"{param[1].Substring(4,4)}-{param[1].Substring(2,2)}-{param[1].Substring(0,2)}"),
                     Condition("p_table_name",tablename),
                     Condition("p_usercode",UserData.user_code),
+                     Condition("p_rate_type",rate_type),
                 }
-            });
+            }).FirstOrDefault().ToString();
             if (value == "1")
             {
                 return new CustomResult("success", new CustomResponse { key_code = param[0], status = "200", msg = "success" });
@@ -513,6 +514,7 @@ namespace DataExchange.Areas.Service.BAL
                 return new CustomResult("success", new CustomResponse { key_code = param[0], status = "300", msg = "error" });
             }
 
+           
         }
 
     }

@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -29,6 +30,10 @@ namespace DataExchange.Areas.Service.Utility
         }
         public async Task Call()
         {
+
+           
+
+
             try
             {
                 JObject json = JObject.Parse(FileHelper.ReadFile(FileHelper.FullPath() + "Areas/Service/Config/ApiConfig.json"));
@@ -52,8 +57,15 @@ namespace DataExchange.Areas.Service.Utility
                         {
                             var jsonString = await result.Content.ReadAsStringAsync();
                             object ResultData = JObject.Parse(jsonString);
-                            _responseList = ResultData.ParseRequestList<CustomResponse>();
+                            _responseList = ResultData.ParseRequestList<CustomResponse>();                           
                             UpdateData();
+                        }
+                        else
+                        {
+                            Repo.Add(new QueryParam
+                            {
+                                DirectQuery = $"insert into error_log(table_name,error_log) values('hosted service','{result.StatusCode}')"
+                            });
                         }
                     }
                 }
@@ -61,7 +73,10 @@ namespace DataExchange.Areas.Service.Utility
             }
             catch(Exception E)
             {
-
+                Repo.Add(new QueryParam
+                {
+                    DirectQuery = $"insert into error_log(table_name,error_log) values('hosted service','{E.Message}')"
+                });
             }
         }
         private void GetData()
@@ -100,7 +115,7 @@ namespace DataExchange.Areas.Service.Utility
 
                 Repo.Add(new QueryParam
                 {
-                    DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,key_code varchar(20) null,update_status int null); {tmp1}{tmp2} update {_Config.table} inner join {tablename} on key_code={_Config.field} set send_status=update_status;drop table {tablename}"
+                    DirectQuery = $"create table {tablename}(id int not null AUTO_INCREMENT PRIMARY KEY,key_code varchar(20) null,update_status int null); {tmp1}{tmp2} update {_Config.table} inner join {tablename} on key_code={_Config.field} set data_post_status=update_status,response_datetime=now();drop table {tablename}"
                 });
             }
             

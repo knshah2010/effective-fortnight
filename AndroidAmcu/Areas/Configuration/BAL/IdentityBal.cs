@@ -315,7 +315,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                         _startup.collectionConfig.qualityParam = new qualityParamClass();
                         foreach (BmcMilkType _type in milktypeList)
                         {                            
-                            UnionRatechartRange _rateRange = NewRepo.FindByColumn<UnionRatechartRange>(new List<ConditionParameter> { Condition("union_code",_request.organizationCode), Condition("config_for",_request.organizationType) });
+                            UnionRatechartRange _rateRange = NewRepo.FindByColumn<UnionRatechartRange>(new List<ConditionParameter> { Condition("union_code", Hierarchy["union_code"]), Condition("config_for",_request.organizationType) });
                             _startup.collectionConfig.milkTypeRate.Add(new milkTypeRateClass {
                                 milkTypeCode = _type.milk_type_code,
                                 milkTypeName = _type.milk_type_name

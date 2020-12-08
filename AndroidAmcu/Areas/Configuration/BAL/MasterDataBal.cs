@@ -38,28 +38,18 @@ namespace AndroidAmcu.Areas.Configuration.BAL
             AndriodInstallationBal _android = new AndriodInstallationBal();           
             if (_android.CheckInstallation(_requst.token, _requst.deviceId, _requst.organizationCode, _requst.organizationType)>0)
             {
-                bool flag=NewRepo.Delete(new List<QueryParam> {
-                    new QueryParam
-                    {
-                        Table="sentbox",
-                        Where=new List<ConditionParameter>
-                        {
-                            Condition("uuid",_requst.content.uuid.ToArray())
-                        }
-                    },
-                    new QueryParam
-                    {
-                        Table="tbl_sentbox_clone",
-                        Where=new List<ConditionParameter>
-                        {
-                            Condition("uuid",_requst.content.uuid.ToArray())
-                        }
-                    }
-                });
-                if (flag)
+                _data = new List<ModelParameter>();
+                foreach(string uuid in _requst.content.uuid.ToArray())
                 {
-                    message = "Sentbox Updated Successfully.";
+                    Sentbox SentBoxModel = NewRepo.FindByKey<Sentbox>(uuid);
+                    SentboxClone SentboxCloneModel = SentBoxModel.Parse< SentboxClone, Sentbox>();
+                    _data.Add(new ModelParameter { ValidateModel = null,SaveModel= SentboxCloneModel });
+                    SentBoxModel.model_operation = "delete";
+                    _data.Add(new ModelParameter { ValidateModel = null, SaveModel = SentBoxModel });
                 }
+                AUDOperation(_data);
+                message = "Sentbox Updated Successfully.";
+                
             }
             data.message = message;
             return new CustomResult2(data);

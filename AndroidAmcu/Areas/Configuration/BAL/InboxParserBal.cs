@@ -68,10 +68,10 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                         {
                             param.Add(UnderScore(pname), DataParam[pname].Value<DateTime>());
                         }
-                        //else if (DataParam[pname].Type.ToString() == "")
-                        //{
-
-                        //}
+                        else if (DataParam[pname].Type.ToString() == "Boolean")
+                        {
+                            param.Add(UnderScore(pname), DataParam[pname].Value<bool>());
+                        }
                         else
                         {
                             param.Add(UnderScore(pname), DataParam[pname].Value<string>());
