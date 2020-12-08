@@ -32,7 +32,7 @@ namespace DataExchange.Areas.Service.BAL
             foreach (Bmc BmcModel in BmcList)
             {
                 Data = new List<ModelParameter>();
-                if (BmcModel.bmc_code != "")
+                if (BmcModel.bmc_code != "" && BmcModel.milk_type != 0)
                 {
                     Bmc NewModel = NewRepo.FindByKey<Bmc>(BmcModel.bmc_code);
                     if (NewModel == null)
@@ -105,7 +105,7 @@ namespace DataExchange.Areas.Service.BAL
                 }
                 else
                 {
-                    _response.Add(new CustomResponse { status = "300", msg = "error:bmc_code" });
+                    _response.Add(new CustomResponse { status = "300", msg = "error:bmc_code or milktype require" });
                 }
             }
             return new CustomResult("success", _response);
@@ -161,7 +161,7 @@ namespace DataExchange.Areas.Service.BAL
             foreach (Dcs DcsModel in DcsList)
             {
                 Data = new List<ModelParameter>();
-                if (DcsModel.dcs_code != "")
+                if (DcsModel.dcs_code != "" && DcsModel.milk_type != 0)
                 {
                     Dcs NewModel = NewRepo.FindByKey<Dcs>(DcsModel.dcs_code);
                     if (NewModel == null)
@@ -196,7 +196,7 @@ namespace DataExchange.Areas.Service.BAL
                 }
                 else
                 {
-                    _response.Add(new CustomResponse { status = "300", msg = "error:dcs_code" });
+                    _response.Add(new CustomResponse { status = "300", msg = "error:dcs_code or milktype require" });
                 }
             }
             return new CustomResult("success", _response);
