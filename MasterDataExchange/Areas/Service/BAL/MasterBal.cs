@@ -99,6 +99,7 @@ namespace DataExchange.Areas.Service.BAL
                         NewModel.contact_no = BmcModel.contact_no;
                         NewModel.model_operation = "update";
                         Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new BmcValidator() });
+                        SetBmcMilkType(BmcModel);
                     }
                     SaveData(BmcModel.bmc_code);
                 }
@@ -189,6 +190,7 @@ namespace DataExchange.Areas.Service.BAL
                         NewModel.x_col1 = SetDcsXcol(DcsModel.allow_multiple_milktype);
                         NewModel.model_operation = "update";
                         Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new DcsValidator() });
+                        SetDcsMilkType(DcsModel);
                     }
                     SaveData(DcsModel.dcs_code);
                 }
@@ -399,6 +401,20 @@ namespace DataExchange.Areas.Service.BAL
 
         private void SetBmcMilkType(Bmc BmcModel)
         {
+            BmcMilkType BmcMilkTypeModel = new BmcMilkType();
+            QueryParam _queryParam = new QueryParam();
+            _queryParam.Where = new List<ConditionParameter>()
+             {
+                Condition("bmc_code",BmcModel.bmc_code)
+             };
+
+            BmcMilkType BmcMilkTypeModelDelete = NewRepo.Find<BmcMilkType>(_queryParam);
+            if (BmcMilkTypeModelDelete != null)
+            {
+                BmcMilkTypeModelDelete.model_operation = "delete";
+                Data.Add(new ModelParameter() { ValidateModel = new BmcMilkTypeValidator(), SaveModel = BmcMilkTypeModelDelete });
+            }
+
             int milk_type = BmcModel.milk_type;
 
             int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 2, 3, 0 }, { 1, 3, 0 }, { 1, 2, 3 } };
@@ -411,7 +427,7 @@ namespace DataExchange.Areas.Service.BAL
                     {
                         if (milkTypeArray[i - 1, j] != 0)
                         {
-                            BmcMilkType BmcMilkTypeModel = new BmcMilkType();
+                           
                             BmcMilkTypeModel.bmc_code = BmcModel.bmc_code;
                             BmcMilkTypeModel.milk_type_code = milkTypeArray[i - 1, j];
                             BmcMilkTypeModel.is_active = true;
@@ -424,6 +440,21 @@ namespace DataExchange.Areas.Service.BAL
 
         private void SetDcsMilkType(Dcs DcsModel)
         {
+            DcsMilkType DcsMilkTypeModel = new DcsMilkType();
+            QueryParam _queryParam = new QueryParam();
+             _queryParam.Where = new List<ConditionParameter>()
+             {
+                Condition("dcs_code",DcsModel.dcs_code)
+             };
+
+            DcsMilkType DcsMilkTypeModelDelete = NewRepo.Find<DcsMilkType>(_queryParam);
+            if (DcsMilkTypeModelDelete != null)
+            {
+                DcsMilkTypeModelDelete.model_operation = "delete";
+                Data.Add(new ModelParameter() { ValidateModel = new DcsMilkTypeValidator(), SaveModel = DcsMilkTypeModelDelete });
+            }
+
+
             int milk_type = DcsModel.milk_type;
 
             int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 2, 3, 0 }, { 1, 3, 0 }, { 1, 2, 3 } };
@@ -436,7 +467,7 @@ namespace DataExchange.Areas.Service.BAL
                     {
                         if (milkTypeArray[i - 1, j] != 0)
                         {
-                            DcsMilkType DcsMilkTypeModel = new DcsMilkType();
+                            
                             DcsMilkTypeModel.dcs_code = DcsModel.dcs_code;
                             DcsMilkTypeModel.milk_type_code = milkTypeArray[i - 1, j];
                             DcsMilkTypeModel.is_active = true;
