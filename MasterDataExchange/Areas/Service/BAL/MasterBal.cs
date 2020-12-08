@@ -396,7 +396,7 @@ namespace DataExchange.Areas.Service.BAL
                 return "1#0";
             else if (allow_multiple_milktype == 4)
                 return "0#0";
-            return "";
+            return "1#1";
         }
 
         private void SetBmcMilkType(Bmc BmcModel)
