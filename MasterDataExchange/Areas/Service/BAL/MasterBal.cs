@@ -1,4 +1,5 @@
 ﻿using DataExchange.Areas.Service.Models;
+using DataExchange.Areas.Service.Utility;
 using Framework.BAL;
 using Framework.CustomDataType;
 using Framework.Extension;
@@ -284,6 +285,8 @@ namespace DataExchange.Areas.Service.BAL
                         CustomerMaster NewModel = NewRepo.Find<CustomerMaster>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", CustomerMasterModel.customer_unique_code) } });
                         if (NewModel == null)
                         {
+                            CustomerMasterModel.customer_code_ex = CustomerMasterModel.customer_code;
+                           // CustomerMasterModel.customer_code = CustomerMasterModel.bmc_code + new GetKey().ReturnValue("customer_code") ;
                             CustomerMasterModel.ref_code = CustomerMasterModel.customer_unique_code;
                             CustomerMasterModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
                             CustomerMasterModel.originating_org_code = CustomerMasterModel.union_code = UnionsModel.union_code;
@@ -292,6 +295,7 @@ namespace DataExchange.Areas.Service.BAL
                         else
                         {
                             NewModel.customer_unique_code = CustomerMasterModel.customer_unique_code;
+                            NewModel.customer_code_ex = CustomerMasterModel.customer_code;
                             NewModel.bmc_code = CustomerMasterModel.bmc_code;
                             NewModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
                             NewModel.route_code = CustomerMasterModel.route_code;

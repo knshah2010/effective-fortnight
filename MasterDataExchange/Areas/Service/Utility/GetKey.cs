@@ -10,7 +10,8 @@ namespace DataExchange.Areas.Service.Utility
         {
             switch (ModelName)
             {
-                case "rate_applicability": return GeneratePK.getPK<PurchaseRateApplicability>();               
+                case "rate_applicability": return GeneratePK.getPK<PurchaseRateApplicability>();
+                case "customer_code": return GeneratePK.getPK<CustomerMaster>();
                 default: return null;
             }
         }
