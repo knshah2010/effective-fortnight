@@ -13,7 +13,7 @@ namespace Models
         [ExplicitKey]
         public string dcs_code { get; set; }
         public int milk_type_code { get; set; }
-        public bool is_active { get; set; }
+        public bool is_active { get; set; } = true;
         public decimal rtpl { get; set; }
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";

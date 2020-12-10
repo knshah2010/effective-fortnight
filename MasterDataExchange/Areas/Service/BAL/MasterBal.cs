@@ -19,6 +19,16 @@ namespace DataExchange.Areas.Service.BAL
         private string result = "";
         private List<ModelParameter> Data;
         private List<CustomResponse> _response;
+        private Dictionary<int, List<int>> MilkTypeList = new Dictionary<int, List<int>>
+            {
+                {1,new List<int>{1}},
+                {2,new List<int>{2}},
+                {3,new List<int>{3}},
+                {4,new List<int>{1,2}},
+                {5,new List<int>{2,3}},
+                {6,new List<int>{1,3}},
+                {7,new List<int>{1,2,3}}
+            };
 
         public MasterBal()
         {
@@ -172,6 +182,7 @@ namespace DataExchange.Areas.Service.BAL
                         else
                             DcsModel.mcc_plant_code = DcsModel.bmc_code;
 
+                        DcsModel.dcs_code_ex = DcsModel.dcs_code.Substring(DcsModel.dcs_code.Length - 4).PadLeft(4,'0');
                         DcsModel.ref_code = DcsModel.dcs_code.PadLeft(15, '0');
                         DcsModel.originating_org_code = DcsModel.union_code = MccPlantModel.union_code;
                         DcsModel.plant_code = MccPlantModel.plant_code;
@@ -238,7 +249,7 @@ namespace DataExchange.Areas.Service.BAL
                     Member NewModel = NewRepo.Find<Member>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", MemberModel.member_unique_code) } });
                     if (NewModel == null)
                     {
-                        MemberModel.ex_member_code = MemberModel.member_code;
+                        MemberModel.ex_member_code = MemberModel.member_code.PadLeft(4, '0');
                         MemberModel.member_code = MemberModel.dcs_code + MemberModel.member_code.PadLeft(4, '0');
                         MemberModel.originating_org_code = UnionsModel.union_code;
                         MemberModel.ref_code = MemberModel.member_unique_code;
@@ -286,15 +297,20 @@ namespace DataExchange.Areas.Service.BAL
                         if (NewModel == null)
                         {
                             CustomerMasterModel.customer_code_ex = CustomerMasterModel.customer_code;
-                           // CustomerMasterModel.customer_code = CustomerMasterModel.bmc_code + new GetKey().ReturnValue("customer_code") ;
+                            int code = NewRepo.Find<int>(new QueryParam { DirectQuery = "select ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0) from tbl_customer_master",
+                                Where =new List<ConditionParameter> { 
+                                    Condition("union_code",UnionsModel.union_code),
+                                    Condition("bmc_code",CustomerMasterModel.bmc_code)
+                                }
+                            });
+                            CustomerMasterModel.customer_code = UnionsModel.union_code+CustomerMasterModel.bmc_code +(code+1);
                             CustomerMasterModel.ref_code = CustomerMasterModel.customer_unique_code;
                             CustomerMasterModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
                             CustomerMasterModel.originating_org_code = CustomerMasterModel.union_code = UnionsModel.union_code;
                             Data.Add(new ModelParameter { SaveModel = CustomerMasterModel, ValidateModel = new CustomerMasterValidator() });
                         }
                         else
-                        {
-                            NewModel.customer_unique_code = CustomerMasterModel.customer_unique_code;
+                        {                           
                             NewModel.customer_code_ex = CustomerMasterModel.customer_code;
                             NewModel.bmc_code = CustomerMasterModel.bmc_code;
                             NewModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
@@ -405,80 +421,62 @@ namespace DataExchange.Areas.Service.BAL
 
         private void SetBmcMilkType(Bmc BmcModel)
         {
-            BmcMilkType BmcMilkTypeModel = new BmcMilkType();
-            QueryParam _queryParam = new QueryParam();
-            _queryParam.Where = new List<ConditionParameter>()
-             {
-                Condition("bmc_code",BmcModel.bmc_code)
-             };
-
-            BmcMilkType BmcMilkTypeModelDelete = NewRepo.Find<BmcMilkType>(_queryParam);
-            if (BmcMilkTypeModelDelete != null)
+            QueryParam _queryParam = new QueryParam
             {
-                BmcMilkTypeModelDelete.model_operation = "delete";
-                Data.Add(new ModelParameter() { ValidateModel = new BmcMilkTypeValidator(), SaveModel = BmcMilkTypeModelDelete });
-            }
-
-            int milk_type = BmcModel.milk_type;
-
-            int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 2, 3, 0 }, { 1, 3, 0 }, { 1, 2, 3 } };
-
-            for (int i = 1; i <= 7; i++)
-            {
-                if (milk_type == i)
+                Where = new List<ConditionParameter>()
                 {
-                    for (int j = 0; j < 3; j++)
-                    {
-                        if (milkTypeArray[i - 1, j] != 0)
-                        {
-                           
-                            BmcMilkTypeModel.bmc_code = BmcModel.bmc_code;
-                            BmcMilkTypeModel.milk_type_code = milkTypeArray[i - 1, j];
-                            BmcMilkTypeModel.is_active = true;
-                            Data.Add(new ModelParameter() { ValidateModel = new BmcMilkTypeValidator(), SaveModel = BmcMilkTypeModel });
-                        }
-                    }
+                    Condition("bmc_code",BmcModel.bmc_code)
                 }
+            };
+
+            List<BmcMilkType> BmcMilkTypeDeleteList = NewRepo.FindAll<BmcMilkType>(_queryParam).ToList();
+            foreach (BmcMilkType DeleteModel in BmcMilkTypeDeleteList.NotEmpty())
+            {
+                DeleteModel.operation_type = "delete";
+                Data.Add(new ModelParameter() { ValidateModel = null, SaveModel = DeleteModel });
+            }
+                       
+            if (BmcModel.milk_type > 7 || BmcModel.milk_type < 1)
+                BmcModel.milk_type = 1;
+
+            foreach(int i in MilkTypeList[BmcModel.milk_type])
+            {
+                BmcMilkType BmcMilkTypeModel = new BmcMilkType() {
+                    bmc_code= BmcModel.bmc_code,
+                    milk_type_code=i,
+                };
+                Data.Add(new ModelParameter() { ValidateModel = null, SaveModel = BmcMilkTypeModel });
             }
         }
 
         private void SetDcsMilkType(Dcs DcsModel)
         {
-            DcsMilkType DcsMilkTypeModel = new DcsMilkType();
-            QueryParam _queryParam = new QueryParam();
-             _queryParam.Where = new List<ConditionParameter>()
-             {
-                Condition("dcs_code",DcsModel.dcs_code)
-             };
-
-            DcsMilkType DcsMilkTypeModelDelete = NewRepo.Find<DcsMilkType>(_queryParam);
-            if (DcsMilkTypeModelDelete != null)
+            QueryParam _queryParam = new QueryParam
             {
-                DcsMilkTypeModelDelete.model_operation = "delete";
-                Data.Add(new ModelParameter() { ValidateModel = new DcsMilkTypeValidator(), SaveModel = DcsMilkTypeModelDelete });
+                Where = new List<ConditionParameter>()
+                {
+                    Condition("dcs_code",DcsModel.dcs_code)
+                }
+            };
+
+            List<DcsMilkType> DcsMilkTypeDeleteList = NewRepo.FindAll<DcsMilkType>(_queryParam).ToList();
+            foreach (DcsMilkType DeleteModel in DcsMilkTypeDeleteList.NotEmpty())
+            {
+                DeleteModel.operation_type = "delete";
+                Data.Add(new ModelParameter() { ValidateModel = null, SaveModel = DeleteModel });
             }
 
+            if (DcsModel.milk_type > 7 || DcsModel.milk_type < 1)
+                DcsModel.milk_type = 1;
 
-            int milk_type = DcsModel.milk_type;
-
-            int[,] milkTypeArray = new int[7, 3] { { 1, 0, 0 }, { 2, 0, 0 }, { 3, 0, 0 }, { 1, 2, 0 }, { 2, 3, 0 }, { 1, 3, 0 }, { 1, 2, 3 } };
-
-            for (int i = 1; i <= 7; i++)
+            foreach (int i in MilkTypeList[DcsModel.milk_type])
             {
-                if (milk_type == i)
+                DcsMilkType DcsMilkTypeModel = new DcsMilkType()
                 {
-                    for (int j = 0; j < 3; j++)
-                    {
-                        if (milkTypeArray[i - 1, j] != 0)
-                        {
-                            
-                            DcsMilkTypeModel.dcs_code = DcsModel.dcs_code;
-                            DcsMilkTypeModel.milk_type_code = milkTypeArray[i - 1, j];
-                            DcsMilkTypeModel.is_active = true;
-                            Data.Add(new ModelParameter() { ValidateModel = new DcsMilkTypeValidator(), SaveModel = DcsMilkTypeModel });
-                        }
-                    }
-                }
+                    dcs_code = DcsModel.dcs_code,
+                    milk_type_code = i,
+                };
+                Data.Add(new ModelParameter() { ValidateModel = null, SaveModel = DcsMilkTypeModel });
             }
         }
 

@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 namespace DataExchange.Areas.Service.Hosted
 {
-    public class MilkCollection : BackgroundService
+    public class RmrdCollection : BackgroundService
     {
         ConsumeApi _api;
         private Timer _timer;
         public override Task StartAsync(CancellationToken cancellationToken)
         {
-            _api = new ConsumeApi("milk_collection");
+            _api = new ConsumeApi("rmrd_collection");
             return base.StartAsync(cancellationToken);
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            this._timer = new Timer(ExecuteTask, null, TimeSpan.Zero,TimeSpan.FromMinutes(1));           
+            this._timer = new Timer(ExecuteTask, null, TimeSpan.Zero, TimeSpan.FromMinutes(2));
             return Task.CompletedTask;
         }
 

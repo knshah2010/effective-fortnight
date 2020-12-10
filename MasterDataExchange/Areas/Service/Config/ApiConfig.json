@@ -1,8 +1,18 @@
 {
   "milk_collection": {
-    "url": "http://prideofmp.in/everest-callback",   
+    "url": "http://prideofmp.in/everest-callback",
     "sp": "proc_milkcollection_data",
     "table": "tbl_milk_collection",
+    "field": "milk_collection_code",
+    "type": "application/json"
+    // "headers": {
+    //   "key": "value"
+    // }
+  },
+  "rmrd_collection": {
+    "url": "http://prideofmp.in/everest-callback",
+    "sp": "proc_bmccollection_data",
+    "table": "tbl_bmc_collection",
     "field": "milk_collection_code",
     "type": "application/json"
     // "headers": {

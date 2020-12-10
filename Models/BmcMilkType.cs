@@ -13,7 +13,7 @@ namespace Models
         [ExplicitKey]
         public string bmc_code { get; set; }
         public int milk_type_code { get; set; }
-        public bool is_active { get; set; }
+        public bool is_active { get; set; } = true;
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
         public string originating_org_type { get; set; } = "portal";
