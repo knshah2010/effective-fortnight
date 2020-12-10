@@ -48,13 +48,38 @@ namespace Models
     {
         public PurchaseRateApplicabilityValidator()
         {
-            
+            QueryParam Query = new QueryParam
+            {
+                Fields = "wef_date",
+                Table = "tbl_purchase_rate_applicability",
+                Where = new List<ConditionParameter>
+                {
+                     new ConditionParameter{PropertyName="purchase_rate_code"},
+                     new ConditionParameter{PropertyName="wef_date"},
+                }
+            };
+            QueryParam range_Query = new QueryParam
+            {
+                Fields = "*",
+                Table = typeof(PurchaseRateApplicability).GetTableName(),
+                Where = new List<ConditionParameter>
+                {
+                    new ConditionParameter{PropertyName="purchase_rate_code" },
+                    new ConditionParameter{PropertyName="wef_date",direct_condition="@wef_date < wef_date and @purchase_rate_code=purchase_rate_code" }
+                },
+
+            };
+
+
             RuleFor(e => e.module_name).Require();
             RuleFor(e => e.module_code).Require();
             RuleFor(e => e.applicability_unique_code).Require();
             List<string> rate_for_condition = new List<string> { "farmer_collection", "rmrd_collection" };
             RuleFor(d => d.rate_for).Require().Must(d => rate_for_condition.Contains(d))
                     .WithMessage("Please only use: " + String.Join(",", rate_for_condition));
+
+            RuleFor(e => e.wef_date).Range(range_Query);
+
         }
     }
 }
