@@ -40,6 +40,10 @@ namespace Models
         public string ref_code { get; set; }
         public string originating_org_type { get; set; } = "portal";
         public string version_no { get; set; } = "V5.0_010520";
+        public bool is_dispatch_mandate { get; set; }
+        public bool is_weight_manual { get; set; }
+        public bool is_quality_manual { get; set; }
+        public bool is_name_request { get; set; }
         [Computed]
         public int milk_type { get; set; }
         [Computed]

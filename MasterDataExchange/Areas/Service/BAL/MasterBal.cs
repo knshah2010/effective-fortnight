@@ -48,7 +48,7 @@ namespace DataExchange.Areas.Service.BAL
                     Bmc NewModel = NewRepo.FindByKey<Bmc>(BmcModel.bmc_code);
                     if (NewModel == null)
                     {
- 
+
                         BmcModel.ref_code = BmcModel.bmc_code;
                         BmcModel.union_code = BmcModel.originating_org_code = UnionsModel.union_code;
                         BmcModel.plant_code = PlantModel.plant_code;
@@ -66,7 +66,7 @@ namespace DataExchange.Areas.Service.BAL
                             };
                             MccPlantModel.union_code = MccPlantModel.originating_org_code = BmcModel.union_code;
                             Data.Add(new ModelParameter { SaveModel = MccPlantModel, ValidateModel = new MccPlantValidator() });
-                            
+
                         }
                         else
                         {
@@ -87,7 +87,7 @@ namespace DataExchange.Areas.Service.BAL
                         BmcSilosInfoModel.milk_type_code = 3;
                         BmcSilosInfoModel.union_code = UnionsModel.union_code;
                         BmcSilosInfoModel.mcc_plant_code = BmcModel.bmc_code;
-                        BmcSilosInfoModel.wef_date= DateHelper.CurrentDate();
+                        BmcSilosInfoModel.wef_date = DateHelper.CurrentDate();
 
                         Data.Add(new ModelParameter { SaveModel = BmcSilosInfoModel, ValidateModel = new BmcSilosInfoValidator() });
                         Data.Add(new ModelParameter { SaveModel = BmcModel, ValidateModel = new BmcValidator() });
@@ -182,7 +182,7 @@ namespace DataExchange.Areas.Service.BAL
                         else
                             DcsModel.mcc_plant_code = DcsModel.bmc_code;
 
-                        DcsModel.dcs_code_ex = DcsModel.dcs_code.Substring(DcsModel.dcs_code.Length - 4).PadLeft(4,'0');
+                        DcsModel.dcs_code_ex = DcsModel.dcs_code.Substring(DcsModel.dcs_code.Length - 4).PadLeft(4, '0');
                         DcsModel.ref_code = DcsModel.dcs_code.PadLeft(15, '0');
                         DcsModel.originating_org_code = DcsModel.union_code = MccPlantModel.union_code;
                         DcsModel.plant_code = MccPlantModel.plant_code;
@@ -200,6 +200,9 @@ namespace DataExchange.Areas.Service.BAL
                         NewModel.mobile_no = DcsModel.mobile_no;
                         NewModel.allow_multiple_milktype = DcsModel.allow_multiple_milktype;
                         NewModel.x_col1 = SetDcsXcol(DcsModel.allow_multiple_milktype);
+                        NewModel.is_dispatch_mandate = DcsModel.is_dispatch_mandate;
+                        NewModel.is_weight_manual = DcsModel.is_weight_manual;
+                        NewModel.is_quality_manual = DcsModel.is_quality_manual;
                         NewModel.model_operation = "update";
                         Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new DcsValidator() });
                         SetDcsMilkType(DcsModel);
@@ -246,9 +249,24 @@ namespace DataExchange.Areas.Service.BAL
                         _welcome.param_value = "Y";
                         Data.Add(new ModelParameter { SaveModel = _welcome, ValidateModel = null });
                     }
+
                     Member NewModel = NewRepo.Find<Member>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", MemberModel.member_unique_code) } });
+
+                    QueryParam _queryParam = new QueryParam
+                    {
+                        Where = new List<ConditionParameter>()
+                        {
+                           Condition("dcs_code",MemberModel.dcs_code)
+                        }
+                    };
+
                     if (NewModel == null)
                     {
+                        Dcs DcsModel = NewRepo.Find<Dcs>(_queryParam);
+                        DcsModel.is_name_request = true;
+                        DcsModel.model_operation = "update";
+                        Data.Add(new ModelParameter { SaveModel = DcsModel, ValidateModel = new DcsValidator() });
+
                         MemberModel.ex_member_code = MemberModel.member_code.PadLeft(4, '0');
                         MemberModel.member_code = MemberModel.dcs_code + MemberModel.member_code.PadLeft(4, '0');
                         MemberModel.originating_org_code = UnionsModel.union_code;
@@ -257,6 +275,11 @@ namespace DataExchange.Areas.Service.BAL
                     }
                     else
                     {
+                        Dcs DcsModel = NewRepo.Find<Dcs>(_queryParam);
+                        DcsModel.is_name_request = true;
+                        DcsModel.model_operation = "update";
+                        Data.Add(new ModelParameter { SaveModel = DcsModel, ValidateModel = new DcsValidator() });
+
                         NewModel.member_unique_code = MemberModel.member_unique_code;
                         NewModel.dcs_code = MemberModel.dcs_code;
                         NewModel.member_name = MemberModel.member_name;
@@ -297,20 +320,22 @@ namespace DataExchange.Areas.Service.BAL
                         if (NewModel == null)
                         {
                             CustomerMasterModel.customer_code_ex = CustomerMasterModel.customer_code;
-                            int code = NewRepo.Find<int>(new QueryParam { DirectQuery = "select ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0) from tbl_customer_master",
-                                Where =new List<ConditionParameter> { 
+                            int code = NewRepo.Find<int>(new QueryParam
+                            {
+                                DirectQuery = "select ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0) from tbl_customer_master",
+                                Where = new List<ConditionParameter> {
                                     Condition("union_code",UnionsModel.union_code),
                                     Condition("bmc_code",CustomerMasterModel.bmc_code)
                                 }
                             });
-                            CustomerMasterModel.customer_code = UnionsModel.union_code+CustomerMasterModel.bmc_code +(code+1);
+                            CustomerMasterModel.customer_code = UnionsModel.union_code + CustomerMasterModel.bmc_code + (code + 1);
                             CustomerMasterModel.ref_code = CustomerMasterModel.customer_unique_code;
                             CustomerMasterModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
                             CustomerMasterModel.originating_org_code = CustomerMasterModel.union_code = UnionsModel.union_code;
                             Data.Add(new ModelParameter { SaveModel = CustomerMasterModel, ValidateModel = new CustomerMasterValidator() });
                         }
                         else
-                        {                           
+                        {
                             NewModel.customer_code_ex = CustomerMasterModel.customer_code;
                             NewModel.bmc_code = CustomerMasterModel.bmc_code;
                             NewModel.x_col1 = SetDcsXcol(CustomerMasterModel.allow_multiple_milktype);
@@ -435,15 +460,16 @@ namespace DataExchange.Areas.Service.BAL
                 DeleteModel.operation_type = "delete";
                 Data.Add(new ModelParameter() { ValidateModel = null, SaveModel = DeleteModel });
             }
-                       
+
             if (BmcModel.milk_type > 7 || BmcModel.milk_type < 1)
                 BmcModel.milk_type = 1;
 
-            foreach(int i in MilkTypeList[BmcModel.milk_type])
+            foreach (int i in MilkTypeList[BmcModel.milk_type])
             {
-                BmcMilkType BmcMilkTypeModel = new BmcMilkType() {
-                    bmc_code= BmcModel.bmc_code,
-                    milk_type_code=i,
+                BmcMilkType BmcMilkTypeModel = new BmcMilkType()
+                {
+                    bmc_code = BmcModel.bmc_code,
+                    milk_type_code = i,
                 };
                 Data.Add(new ModelParameter() { ValidateModel = null, SaveModel = BmcMilkTypeModel });
             }
@@ -462,7 +488,7 @@ namespace DataExchange.Areas.Service.BAL
             List<DcsMilkType> DcsMilkTypeDeleteList = NewRepo.FindAll<DcsMilkType>(_queryParam).ToList();
             foreach (DcsMilkType DeleteModel in DcsMilkTypeDeleteList.NotEmpty())
             {
-                DeleteModel.operation_type = "delete";
+                DeleteModel.model_operation = "delete";
                 Data.Add(new ModelParameter() { ValidateModel = null, SaveModel = DeleteModel });
             }
 
@@ -545,7 +571,7 @@ namespace DataExchange.Areas.Service.BAL
             {
                 DirectQuery = DirectQuery
             });
-            string  value = NewRepo.FindAll<string>(new QueryParam
+            string value = NewRepo.FindAll<string>(new QueryParam
             {
                 Sp = "import_rate",
                 Where = new List<ConditionParameter>
@@ -566,7 +592,7 @@ namespace DataExchange.Areas.Service.BAL
                 return new CustomResult("success", new CustomResponse { key_code = param[0], status = "300", msg = "error" });
             }
 
-           
+
         }
 
     }
