@@ -1,7 +1,5 @@
 ﻿using AndroidAmcu.Areas.Configuration.Models;
-using AndroidAmcu.Areas.Configuration.Utility;
 using AndroidAmcu.Areas.General.Models;
-using Framework.BAL;
 using Framework.CustomDataType;
 using Framework.DataAccess.Dapper;
 using Framework.Extension;
@@ -17,12 +15,12 @@ using System.Linq;
 namespace AndroidAmcu.Areas.Configuration.BAL
 {
 
-    public class IdentityBal : BaseBal
+    public class IdentityBal : OrgBal
     {
         private QueryParam _query;
         private List<ModelParameter> _data;
         private RequestFormat1 _request;
-        private Dictionary<string, List<string>> Hierarchy;       
+           
         public IdentityBal(RequestFormat1 request)
         {
             _request = request;            
@@ -30,18 +28,36 @@ namespace AndroidAmcu.Areas.Configuration.BAL
 
         public IActionResult Registration()
         {
-            Bmc BmcModel = NewRepo.FindByKey<Bmc>(_request.organizationCode);
-            dynamic data = new ExpandoObject();
-            if (BmcModel != null)
+            string contact_no="";
+            if (_request.organizationType == "BMC")
             {
-                if (_request.content.mobileNo != null && _request.content.mobileNo.Trim() == BmcModel.contact_no.Trim())
+                Bmc BmcModel = NewRepo.FindByKey<Bmc>(_request.organizationCode);
+                if (BmcModel != null)
+                {                   
+                    contact_no = BmcModel.contact_no;
+                }
+                    
+            }
+            else if(_request.organizationType == "VLC")
+            {
+                Dcs DscModel= NewRepo.FindByKey<Dcs>(_request.organizationCode);
+                if (DscModel != null)
+                {                   
+                    contact_no = DscModel.mobile_no;
+                }
+            }
+            
+            dynamic data = new ExpandoObject();
+            if (contact_no.Trim()!="" )
+            {
+                if (_request.content.mobileNo != null && _request.content.mobileNo.Trim() == contact_no.Trim())
                 {
                     _data = new List<ModelParameter>();
                     AndroidInstallationDetails DetailModel;
                     AndroidInstallation InstalationModel = NewRepo.FindByColumn<AndroidInstallation>(new List<ConditionParameter>
                     {
-                         Condition("organization_code",BmcModel.bmc_code),
-                         Condition("organization_type","BMC"),
+                         Condition("organization_code",_request.organizationCode),
+                         Condition("organization_type",_request.organizationType),
                     });
 
                     if (InstalationModel == null)
@@ -49,10 +65,10 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                         InstalationModel = new AndroidInstallation
                         {
                             android_installation_id = DbHelper.UniqueKey(),
-                            organization_code = BmcModel.bmc_code,
-                            organization_type = "BMC",
-                            module_code= BmcModel.bmc_code,
-                            module_name= "BMC",
+                            organization_code = _request.organizationCode,
+                            organization_type = _request.organizationType,
+                            module_code= _request.organizationCode,
+                            module_name= _request.organizationType,
                         };
                         InstalationModel.application_installation_code = InstalationModel.android_installation_id;
                         DetailModel = SetDetail(InstalationModel.android_installation_id);
@@ -64,7 +80,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                         {
                            Condition("android_installation_id",InstalationModel.android_installation_id),
                            Condition("device_id",_request.deviceId),
-                           Condition("mobile_no",BmcModel.contact_no.Trim()),
+                           Condition("mobile_no",contact_no.Trim()),
                            Condition("is_active",1)
                         });
                         if (DetailModel == null)
@@ -139,28 +155,60 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                 CustomResult result = AUDOperation(_data);
                 if (result._result.message.ToLower() == "success")
                 {
-                    _query = new QueryParam
+                    string pcode = "", pname="",ptype = "";
+                    if (_request.organizationType == "BMC")
                     {
-                        Fields= "tbl_mcc_plant.mcc_plant_code,tbl_mcc_plant.name",
-                        Join = new List<JoinParameter>
+                        _query = new QueryParam
                         {
-                            new JoinParameter{table="tbl_bmc",condition="tbl_bmc.mcc_plant_code=tbl_mcc_plant.mcc_plant_code"}
-                        },
-                        Where = new List<ConditionParameter>
+                            Fields = "tbl_mcc_plant.mcc_plant_code,tbl_mcc_plant.name",
+                            Join = new List<JoinParameter>
+                            {
+                                new JoinParameter{table="tbl_bmc",condition="tbl_bmc.mcc_plant_code=tbl_mcc_plant.mcc_plant_code"}
+                            },
+                            Where = new List<ConditionParameter>
+                            {
+                                Condition("bmc_code",_request.organizationCode)
+                            }
+                        };
+                        MccPlant MccModel = NewRepo.Find<MccPlant>(_query);
+                        if (MccModel == null)
                         {
-                            Condition("bmc_code",_request.organizationCode)
+                            return new CustomResult2(data, "OTP Not Verified.");
                         }
-                    };
-                    MccPlant MccModel = NewRepo.Find<MccPlant>(_query);
-                    if (MccModel == null)
+                        pcode = MccModel.mcc_plant_code;
+                        pname = MccModel.name;
+                        ptype = "MCC";
+                    }
+                    else if (_request.organizationType == "VLC")
                     {
-                        return new CustomResult2(data, "OTP Not Verified.");
-                    }                    
+                        _query = new QueryParam
+                        {
+                            Fields = "tbl_bmc.bmc_code,bmc_name",
+                            Join = new List<JoinParameter>
+                            {
+                                new JoinParameter{table="tbl_dcs",condition="tbl_dcs.bmc_code=tbl_bmc.bmc_code"}
+                            },
+                            Where = new List<ConditionParameter>
+                            {
+                                Condition("dcs_code",_request.organizationCode)
+                            }
+                        };
+                        Bmc BmcModel = NewRepo.Find<Bmc>(_query);
+                        if (BmcModel == null)
+                        {
+                            return new CustomResult2(data, "OTP Not Verified.");
+                        }
+                        pcode = BmcModel.bmc_code;
+                        pname = BmcModel.bmc_name;
+                        ptype = "BMC";
+                    }
+                    
+                                       
                     data.message = "OTP Verified";
                     data.syncKey = DetailModel.sync_key;
-                    data.parentType = "MCC";
-                    data.parentCode = MccModel.mcc_plant_code;
-                    data.parentName = MccModel.name;
+                    data.parentType = ptype;
+                    data.parentCode = pcode;
+                    data.parentName = pname;
                     return new CustomResult2(data);
                 }
                 return new CustomResult2(data, "OTP Not Verified.");
@@ -185,7 +233,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                 };
                 List<string> SqliteTable = Sqlite.FindAll<string>(_query).ToList();
                 List<TableList> AllTableList = NewRepo.FindAll<TableList>(new QueryParam {Where=new List<ConditionParameter> { Condition("is_offline",0)} }).ToList();               
-                OrgDetail();
+                OrgDetail(_request.organizationCode);
                 foreach (TableList tables in AllTableList)
                 {
                     if (SqliteTable.Contains(tables.table_name.Trim()))
@@ -260,11 +308,24 @@ namespace AndroidAmcu.Areas.Configuration.BAL
             bool is_member_rate = true;
             if (_android.CheckInstallation(_request.token, _request.deviceId, _request.organizationCode, _request.organizationType) > 0)
             {
-                OrgDetail();
+                OrgDetail(_request.organizationCode);
                 if (Hierarchy != null)
                 {
                     if (_request.organizationType.ToLower().Trim() == "bmc")
                     {
+                    }
+                    else if (_request.organizationType.ToLower().Trim() == "vlc")
+                    {
+                        rateClass rateData = NewRepo.Find<rateClass>(new QueryParam { Sp = "proc_current_rate_detail", Where = new List<ConditionParameter> { Condition("p_dcs_code",_request.organizationCode) } });
+                        if (rateData != null)
+                        {
+                            _startup.rate.mPurchaseRateCode = rateData.mPurchaseRateCode;
+                            _startup.rate.ePurchaseRateCode = rateData.ePurchaseRateCode;
+                            _startup.rate.mPurchaseRateCodeBlock = rateData.mPurchaseRateCodeBlock;
+                            _startup.rate.ePurchaseRateCodeBlock = rateData.ePurchaseRateCodeBlock;
+                        }
+                        
+                    }
                         //config object
                         List<UnionConfigResult> _configResult = NewRepo.FindAll<UnionConfigResult>(new QueryParam { 
                             Table= "tbl_union_config_result",
@@ -295,8 +356,10 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                         _startup.config.Add("collectionBlock", false);
                         _startup.config.Add("dcsBlock", false);
                         _startup.config.Add("dispatchMandate", false);
-                       //  _startup.config.Add("", "");
-
+                        //  _startup.config.Add("", "");
+                        Bmc BmcModel = NewRepo.FindByKey<Bmc>(Hierarchy["bmc_code"]);                        
+                        _startup.config.Add("weightManual", BmcModel.is_weight_manual);
+                        _startup.config.Add("qualityManual", BmcModel.is_quality_manual);
 
 
                         //$MappedMilkType = $model_data->tblBmcMilkType;
@@ -406,7 +469,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                                     Condition("p_org_code",_request.organizationCode),
                                }
                          }).ToList();                        
-                    }
+                   
                 }
             }
             return new CustomResult2(_startup);
@@ -424,34 +487,6 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                 version_no= _request.versionNo
             };
         }
-
-        private void OrgDetail()
-        {
-            Hierarchy = new Dictionary<string, List<string>>();
-            List<Dcs> OrgData = NewRepo.FindAll<Dcs>(new QueryParam {
-                Fields= "union_code,plant_code,mcc_plant_code,bmc_code,dcs_code",
-                Where=new List<ConditionParameter>
-                {
-                    Condition("bmc_code",_request.organizationCode)
-                }
-            }).ToList();
-            if (OrgData == null || OrgData.Count()==0)
-            {
-                Bmc BmcData = NewRepo.FindByKey<Bmc>(_request.organizationCode);
-                Hierarchy.Add("union_code", new List<string> { BmcData.union_code });
-                Hierarchy.Add("plant_code", new List<string> { BmcData.plant_code});
-                Hierarchy.Add("mcc_plant_code", new List<string> { BmcData.mcc_plant_code });
-                Hierarchy.Add("bmc_code", new List<string> { _request.organizationCode });
-                Hierarchy.Add("dcs_code", new List<string> {""});
-            }
-            else
-            {
-                Hierarchy.Add("union_code", new List<string> { OrgData.Select(x => x.union_code).FirstOrDefault() });
-                Hierarchy.Add("plant_code", new List<string> { OrgData.Select(x => x.plant_code).FirstOrDefault() });
-                Hierarchy.Add("mcc_plant_code", new List<string> { OrgData.Select(x => x.mcc_plant_code).FirstOrDefault() });
-                Hierarchy.Add("bmc_code", new List<string> { _request.organizationCode });
-                Hierarchy.Add("dcs_code", OrgData.Select(x => x.dcs_code).ToList());             
-            }              
-        }
+                
     }
 }

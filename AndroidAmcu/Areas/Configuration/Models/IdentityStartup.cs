@@ -133,7 +133,7 @@ namespace AndroidAmcu.Areas.Configuration.Models
         public string e_lock_time { get; set; }
         [JsonProperty("dateShiftEnable")]
         public string date_shift_enable { get; set; }
-        [JsonProperty("grace_hr")]
-        public string graceHr { get; set; }
+        [JsonProperty("graceHr")]
+        public string grace_hr { get; set; }
     }  
 }

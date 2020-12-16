@@ -2,6 +2,7 @@
 using Dapper.Contrib.Extensions;
 using System;
 using Newtonsoft.Json;
+using Framework.Library.Helper;
 
 namespace AndroidAmcu.Areas.Configuration.Models
 {
@@ -36,15 +37,16 @@ namespace AndroidAmcu.Areas.Configuration.Models
 		public string originating_org_type { get; set; }
 		[JsonProperty("postingTimestamp")]
 		public DateTime posting_timestamp { get; set; }
-		public DateTime sync_timestamp { get; set; }
+		public DateTime sync_timestamp { get; set; } = DateHelper.CurrentDate();
 		[JsonProperty("sourceDeviceMac")]
 		public string source_device_mac { get; set; }
 		[JsonProperty("versionNo")]
 		public string version_no { get; set; }
 
 		public string device_id { get; set; }
-		public DateTime error_timestamp { get; set; }
-		public DateTime processed_timestamp { get; set; }
+
+		public DateTime? error_timestamp { get; set; }
+		public DateTime processed_timestamp { get; set; } = DateHelper.CurrentDate();
 		[Computed]
 		public new string flg_sentbox_entry { get; set; } = "N";
 		[Computed]

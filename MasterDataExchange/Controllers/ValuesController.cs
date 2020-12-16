@@ -57,7 +57,7 @@ namespace Test.Controllers
         [Route("consume")]
         public void consume()
         {
-            ConsumeApi _api=new ConsumeApi("milk_collection");
+            ConsumeApi _api=new ConsumeApi("rmrd_collection");
             _api.Call();
         }
 

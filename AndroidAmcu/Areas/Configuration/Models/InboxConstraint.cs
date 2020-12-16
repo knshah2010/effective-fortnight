@@ -42,7 +42,7 @@ namespace AndroidAmcu.Areas.Configuration.Models
         [JsonProperty("versionNo")]
         public string version_no { get; set; }
         public string device_id { get; set; }
-        public DateTime error_timestamp { get; set; }
+        public DateTime? error_timestamp { get; set; }
         public DateTime processed_timestamp { get; set; }
         [Computed]
         public new string flg_sentbox_entry { get; set; } = "N";
