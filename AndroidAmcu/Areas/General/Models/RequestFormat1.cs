@@ -21,8 +21,8 @@ namespace AndroidAmcu.Areas.General.Models
         public string mobileNo { get; set; } 
         public string otpCode { get; set; }
         public string dcsCode { get; set; }
-        public string rateType { get; set; }
-        public string rateClass { get; set; }
+        public string rateType { get; set; } = "";
+        public string rateClass { get; set; } = "";
         public string milkQualityTypeCode { get; set; }
         public string milkTypeCode { get; set; }
         public string purchaseRateCode { get; set; }

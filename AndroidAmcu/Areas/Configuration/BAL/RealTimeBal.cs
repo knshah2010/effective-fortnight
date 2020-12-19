@@ -31,7 +31,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
             data.data = Param;
             return JObject.FromObject(data);
         }
-        public void GetRate()
+        public IActionResult GetRate()
         {
             bool isMultiApplicabilty = (_request.content.rateType.Trim() == "") ? false : true;
             string rate_table = "tbl_purchase_rate", base_table = "tbl_purchase_rate_based",app_table= "tbl_purchase_rate_applicability",op="=";
@@ -42,17 +42,17 @@ namespace AndroidAmcu.Areas.Configuration.BAL
             dynamic data = new ExpandoObject();
             data.purchaseRate = NewRepo.Find<TmpPurchaseRate>(new QueryParam { 
                 Table= rate_table,
-                Where=new List<ConditionParameter> { Condition("purchase_rate_code ", _request.content.purchaseRateCode)}
+                Where=new List<ConditionParameter> { Condition("purchase_rate_code", _request.content.purchaseRateCode)}
             });
             data.purchaseRateBased= NewRepo.FindAll<TmpPurchaseRateBase>(new QueryParam
             {
                 Table = base_table,
-                Where = new List<ConditionParameter> { Condition("purchase_rate_code ", _request.content.purchaseRateCode) }
+                Where = new List<ConditionParameter> { Condition("purchase_rate_code", _request.content.purchaseRateCode) }
             });
             if (isMultiApplicabilty)
             {
                 data.purchaseRateApplicability = null;
-                OrgDetail(_request.organizationCode);
+                OrgDetail(_request.organizationCode,_request.organizationType);
                 QueryParam query = new QueryParam
                 {
                     Table = app_table,
@@ -63,7 +63,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                     Where=new List<ConditionParameter>
                     {
                         Condition($"{app_table}.purchase_rate_code",_request.content.purchaseRateCode),
-                        new ConditionParameter{direct_condition="tbl_rate_download_ack.ack_id is null"}
+                        new ConditionParameter{direct_condition="tbl_rate_download_ack.ack_id is null",PropertyName="ack_id",PropertyValue="#$#"}
                     }
                 };
                 if (_request.content.rateType.Trim() == "BMC")
@@ -72,7 +72,9 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                     string customer_type = NewRepo.Find<string>(new QueryParam { Fields = "customer_type", Table = "tbl_customer_type", Where = new List<ConditionParameter> { Condition("is_organisation",0) } });  
                     query.Where.Add(new ConditionParameter
                     {
-                        direct_condition = $"(( applicable_code='{Hierarchy["plant_code"]}' and applicable_for='PLANT') or ( applicable_code='{Hierarchy["mcc_plant_code"]}' and applicable_for='MCC') or ( applicable_code='{Hierarchy["bmc_code"]}' and applicable_for='BMC') or ( applicable_code='{Hierarchy["dcs_code"]}' and applicable_for='DCS') or ( applicable_code='{customer_code}' and applicable_for='{customer_type}'))"
+                        direct_condition = $"(( applicable_code='{Hierarchy["plant_code"]}' and applicable_for='PLANT') or ( applicable_code='{Hierarchy["mcc_plant_code"]}' and applicable_for='MCC') or ( applicable_code='{Hierarchy["bmc_code"]}' and applicable_for='BMC') or ( applicable_code='{Hierarchy["dcs_code"]}' and applicable_for='DCS') or ( applicable_code='{customer_code}' and applicable_for='{customer_type}'))",
+                        PropertyName = "ack_id",
+                        PropertyValue = "#$#"
                     }); ;
                 }
                 else
@@ -101,6 +103,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                     });
                 }
             }
+            return new CustomResult2(data);
 
         }
         public IActionResult GetRateDetail()

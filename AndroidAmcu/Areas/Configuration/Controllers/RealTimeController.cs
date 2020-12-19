@@ -24,13 +24,13 @@ namespace AndroidAmcu.Areas.Configuration.Controllers
             List<TmpMember> list = _listEngine.List<TmpMember>(_bal.PrepareData(data.ParseRequestWithoutData<RequestFormat1>()), FileName, "member");
             return new CustomResult2(list);
         }
-        //[HttpPost]
-        //[Route("purchase-rate")]
-        //public IActionResult PurchaseRate([FromBody] object data)
-        //{
-        //    RealTimeBal _bal = new RealTimeBal();
-           
-        //}
+        [HttpPost]
+        [Route("purchase-rate")]
+        public IActionResult PurchaseRate([FromBody] object data)
+        {
+            RealTimeBal _bal = new RealTimeBal(data.ParseRequestWithoutData<RequestFormat1>());
+            return _bal.GetRate();
+        }
         [HttpPost]
         [Route("purchase-rate-detail")]
         public IActionResult PurchaseRateDetail([FromBody] object data)
