@@ -322,11 +322,13 @@ namespace DataExchange.Areas.Service.BAL
                             CustomerMasterModel.customer_code_ex = CustomerMasterModel.customer_code;
                             int code = NewRepo.Find<int>(new QueryParam
                             {
-                                DirectQuery = "select ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0) from tbl_customer_master",
-                                Where = new List<ConditionParameter> {
-                                    Condition("union_code",UnionsModel.union_code),
-                                    Condition("bmc_code",CustomerMasterModel.bmc_code)
-                                }
+//                                select max(cast(ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0)as unsigned))  from tbl_customer_master where
+//substring(customer_code,1,length(concat(union_code,bmc_code)))=concat(union_code,bmc_code);
+                            DirectQuery = "select max(cast(ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0)as unsigned))  from tbl_customer_master where substring(customer_code,1,length(concat(union_code,bmc_code)))=concat(union_code,bmc_code)",
+                                //Where = new List<ConditionParameter> {
+                                //    Condition("union_code",UnionsModel.union_code),
+                                //    Condition("bmc_code",CustomerMasterModel.bmc_code)
+                                //}
                             });
                             CustomerMasterModel.customer_code = UnionsModel.union_code + CustomerMasterModel.bmc_code + (code + 1);
                             CustomerMasterModel.ref_code = CustomerMasterModel.customer_unique_code;
