@@ -346,6 +346,7 @@ namespace DataExchange.Areas.Service.BAL
                             NewModel.is_active = CustomerMasterModel.is_active;
                             NewModel.mobile_no = CustomerMasterModel.mobile_no;
                             NewModel.customer_type = CustomerMasterModel.customer_type;
+                            NewModel.customer_unique_code = CustomerMasterModel.ref_code;
                             NewModel.model_operation = "update";
                             Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new CustomerMasterValidator() });
                         }
