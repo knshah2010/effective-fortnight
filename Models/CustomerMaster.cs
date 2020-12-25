@@ -6,7 +6,7 @@ using System;
 using Framework.Library.Helper;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Framework.Library.Converter;
+using Framework.Library;
 
 namespace Models
 {
@@ -56,6 +56,8 @@ namespace Models
         public CustomerMasterValidator()
         {
             RuleFor(d => d.customer_code).Require();
+            RuleFor(d => d.customer_code_ex).Unique();
+            RuleFor(d => d.ref_code).Unique();
             RuleFor(d => d.customer_unique_code).Require();
             RuleFor(d => d.customer_name).Require();
             RuleFor(d => d.customer_type).Require();

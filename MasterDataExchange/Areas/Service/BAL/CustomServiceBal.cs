@@ -73,14 +73,6 @@ namespace DataExchange.Areas.Service.BAL
 
                         Member NewModel = NewRepo.Find<Member>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", MemberModel.member_unique_code) } });
 
-                        //QueryParam _queryParam = new QueryParam
-                        //{
-                        //    Where = new List<ConditionParameter>()
-                        //{
-                        //   Condition("dcs_code",MemberModel.dcs_code)
-                        //}
-                        //};
-
                         if (NewModel == null)
                         {
 
@@ -102,7 +94,6 @@ namespace DataExchange.Areas.Service.BAL
                             Data.Add(new ModelParameter { SaveModel = DcsModel, ValidateModel = new DcsValidator() });
 
                             NewModel.member_unique_code = MemberModel.member_unique_code;
-                            NewModel.dcs_code = MemberModel.dcs_code;
                             NewModel.member_name = MemberModel.member_name;
                             NewModel.is_active = MemberModel.is_active;
                             NewModel.mobile_no = MemberModel.mobile_no;
@@ -114,15 +105,30 @@ namespace DataExchange.Areas.Service.BAL
                     else
                     {
                         CustomerMaster CustomerMasterModel = new CustomerMaster();
+                        QueryParam query = new QueryParam
+                        {
+                            Fields = "code_length",
+                            Table= "tbl_customer_type",
+                            Where = new List<ConditionParameter>
+                            {
+                                Condition("customer_type","BULKVEN"),
+                            }
+                        };
+                        CustomerType CustomerTypeModel = NewRepo.Find<CustomerType>(query);
+                        if (MemberModel.member_code.Length > CustomerTypeModel.code_length)
+                        {
+                            return new CustomResult("success", new CustomResponse { status = "300", msg = "error:member_code:Max Length Should be 4" });
+                        }
 
                         Bmc BmcModel = NewRepo.Find<Bmc>(new QueryParam { Where = new List<ConditionParameter> { Condition("bmc_code", MemberModel.dcs_code) } });
                         if (BmcModel != null)
                         {
                             Route RouteModel = NewRepo.Find<Route>(new QueryParam { Where = new List<ConditionParameter> { Condition("to_dest", MemberModel.dcs_code) } });
                             CustomerMaster NewModel = NewRepo.Find<CustomerMaster>(new QueryParam { Where = new List<ConditionParameter> { Condition("ref_code", MemberModel.member_unique_code) } });
+
                             if (NewModel == null)
                             {
-                                CustomerMasterModel.customer_code_ex = "A" + MemberModel.member_code.PadLeft(4, '0');
+                                CustomerMasterModel.customer_code_ex = "A" + MemberModel.member_code.PadLeft(CustomerTypeModel.code_length, '0');
                                 int code = NewRepo.Find<int>(new QueryParam
                                 {
                                     DirectQuery = "select max(cast(ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0)as unsigned))  from tbl_customer_master where substring(customer_code,1,length(concat(union_code,bmc_code)))=concat(union_code,bmc_code)",
@@ -144,8 +150,7 @@ namespace DataExchange.Areas.Service.BAL
                             }
                             else
                             {
-                                NewModel.customer_code_ex = "A" + MemberModel.member_code.PadLeft(4, '0');
-                                NewModel.bmc_code = MemberModel.dcs_code;
+
                                 NewModel.customer_unique_code = MemberModel.member_unique_code;
                                 NewModel.route_code = RouteModel.route_code;
                                 NewModel.customer_name = MemberModel.member_name;
