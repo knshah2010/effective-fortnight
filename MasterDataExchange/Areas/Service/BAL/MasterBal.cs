@@ -322,9 +322,9 @@ namespace DataExchange.Areas.Service.BAL
                             CustomerMasterModel.customer_code_ex = CustomerMasterModel.customer_code;
                             int code = NewRepo.Find<int>(new QueryParam
                             {
-//                                select max(cast(ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0)as unsigned))  from tbl_customer_master where
-//substring(customer_code,1,length(concat(union_code,bmc_code)))=concat(union_code,bmc_code);
-                            DirectQuery = "select max(cast(ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0)as unsigned))  from tbl_customer_master where substring(customer_code,1,length(concat(union_code,bmc_code)))=concat(union_code,bmc_code)",
+                                //                                select max(cast(ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0)as unsigned))  from tbl_customer_master where
+                                //substring(customer_code,1,length(concat(union_code,bmc_code)))=concat(union_code,bmc_code);
+                                DirectQuery = "select max(cast(ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0)as unsigned))  from tbl_customer_master where substring(customer_code,1,length(concat(union_code,bmc_code)))=concat(union_code,bmc_code)",
                                 //Where = new List<ConditionParameter> {
                                 //    Condition("union_code",UnionsModel.union_code),
                                 //    Condition("bmc_code",CustomerMasterModel.bmc_code)
@@ -391,20 +391,57 @@ namespace DataExchange.Areas.Service.BAL
             foreach (PurchaseRateApplicability PurchaseRateApplicabilityModel in PurchaseRateApplicabilityList)
             {
                 Data = new List<ModelParameter>();
-                if (PurchaseRateApplicabilityModel.module_name.ToLower() == "dcs")
+
+                if (PurchaseRateApplicabilityModel.rate_for == "farmer_collection")
                 {
-                    if (PurchaseRateApplicabilityModel.rate_for == "farmer_collection")
+                    PurchaseRateApplicabilityModel.rate_app_code = (code + 1).ToString();
+                    PurchaseRateApplicabilityModel.ref_code = PurchaseRateApplicabilityModel.applicability_unique_code;
+                    PurchaseRateApplicabilityModel.originating_org_code = PurchaseRateApplicabilityModel.union_code = UnionsModel.union_code;
+                    PurchaseRateApplicabilityModel.dcs_code = PurchaseRateApplicabilityModel.module_code;
+                    PurchaseRateApplicabilityModel.shift_code = shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.id).FirstOrDefault();
+                    string time = PurchaseRateApplicabilityModel.wef_date.ToString("yyyy-MM-dd") + " " + shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.shift_time.ToString(@"hh\:mm\:ss")).FirstOrDefault();
+                    PurchaseRateApplicabilityModel.wef_date = DateHelper.ParseDate(time);
+                    Data.Add(new ModelParameter { SaveModel = PurchaseRateApplicabilityModel, ValidateModel = new PurchaseRateApplicabilityValidator() });
+                    SaveData(PurchaseRateApplicabilityModel.applicability_unique_code);
+
+                }
+                else
+                {
+                    DcsPurchaseRateApplicability DcsPurchaseRateApplicabilityModel = new DcsPurchaseRateApplicability();
+                    //string module_code = null;
+                    if (PurchaseRateApplicabilityModel.module_name.ToLower() != "dcs")
                     {
-                        PurchaseRateApplicabilityModel.rate_app_code = (code + 1).ToString();
-                        PurchaseRateApplicabilityModel.ref_code = PurchaseRateApplicabilityModel.applicability_unique_code;
-                        PurchaseRateApplicabilityModel.originating_org_code = PurchaseRateApplicabilityModel.union_code = UnionsModel.union_code;
-                        PurchaseRateApplicabilityModel.dcs_code = PurchaseRateApplicabilityModel.module_code;
-                        PurchaseRateApplicabilityModel.shift_code = shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.id).FirstOrDefault();
-                        string time = PurchaseRateApplicabilityModel.wef_date.ToString("yyyy-MM-dd") + " " + shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.shift_time.ToString(@"hh\:mm\:ss")).FirstOrDefault();
-                        PurchaseRateApplicabilityModel.wef_date = DateHelper.ParseDate(time);
-                        Data.Add(new ModelParameter { SaveModel = PurchaseRateApplicabilityModel, ValidateModel = new PurchaseRateApplicabilityValidator() });
-                        SaveData(PurchaseRateApplicabilityModel.applicability_unique_code);
+                        QueryParam _queryParam = new QueryParam
+                        {
+                            Fields = "customer_code,customer_type",
+                            Table = "tbl_customer_master",
+                            Where = new List<ConditionParameter>()
+                        {
+                           Condition("ref_code",PurchaseRateApplicabilityModel.module_code)
+                        }
+                        };
+                        CustomerMaster CustomerMasterModel = NewRepo.Find<CustomerMaster>(_queryParam);
+
+                        DcsPurchaseRateApplicabilityModel.applicable_code = CustomerMasterModel.customer_code;
+                        DcsPurchaseRateApplicabilityModel.applicable_for = PurchaseRateApplicabilityModel.module_name;
                     }
+                    else
+                    {
+                        DcsPurchaseRateApplicabilityModel.applicable_for = PurchaseRateApplicabilityModel.module_name;
+                        DcsPurchaseRateApplicabilityModel.applicable_code = PurchaseRateApplicabilityModel.module_code;
+                    }
+                    DcsPurchaseRateApplicabilityModel.applicability_unique_code = PurchaseRateApplicabilityModel.applicability_unique_code;
+                   // DcsPurchaseRateApplicabilityModel.rate_app_code = (code + 1).ToString();
+                    DcsPurchaseRateApplicabilityModel.purchase_rate_code = PurchaseRateApplicabilityModel.purchase_rate_code;
+
+                    DcsPurchaseRateApplicabilityModel.originating_org_code = DcsPurchaseRateApplicabilityModel.union_code = UnionsModel.union_code;
+                    DcsPurchaseRateApplicabilityModel.shift_code = shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.id).FirstOrDefault();
+                    string time = PurchaseRateApplicabilityModel.wef_date.ToString("yyyy-MM-dd") + " " + shiftList.Where(x => x.short_name.ToLower() == PurchaseRateApplicabilityModel.shift.ToLower()).Select(x => x.shift_time.ToString(@"hh\:mm\:ss")).FirstOrDefault();
+                    DcsPurchaseRateApplicabilityModel.wef_date = DateHelper.ParseDate(time);
+                    DcsPurchaseRateApplicabilityModel.is_active = PurchaseRateApplicabilityModel.is_active;
+
+                    Data.Add(new ModelParameter { SaveModel = DcsPurchaseRateApplicabilityModel, ValidateModel = new DcsPurchaseRateApplicabilityValidator() });
+                    SaveData(DcsPurchaseRateApplicabilityModel.applicability_unique_code);
 
                 }
             }
