@@ -57,5 +57,13 @@ namespace AndroidAmcu.Areas.Configuration.Models
         public new int originating_type { get; set; } = 0;
         [Computed]
         public new string originating_org_code { get; set; }
+        [Computed]
+        public new DateTime? created_at { get; set; }
+        [Computed]
+        public new string created_by { get; set; }
+        [Computed]
+        public new DateTime? updated_at { get; set; }
+        [Computed]
+        public new string updated_by { get; set; }
     }
 }

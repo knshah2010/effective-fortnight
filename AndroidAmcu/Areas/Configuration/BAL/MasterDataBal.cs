@@ -24,8 +24,8 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                     Condition("dest_org_type",request.organizationType),
                     Condition("device_id",request.deviceId),                    
                 },
-                //Offset=1,
-                //Limit=5
+                Offset = 0,
+                Limit = 5
             };
             dynamic data = new ExpandoObject();
             data.data = Param;

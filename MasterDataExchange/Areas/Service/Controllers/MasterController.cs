@@ -90,7 +90,7 @@ namespace DataExchange.Areas.Service.Controllers
         }
 
         [HttpPost]
-        [Route("member")]
+        [Route("new_member")]
         public IActionResult Member([FromBody] object data)
         {
             MasterBal _bal = new MasterBal();
@@ -116,7 +116,7 @@ namespace DataExchange.Areas.Service.Controllers
         }
 
         [HttpPost]
-        [Route("customer")]
+        [Route("new_customer")]
         public IActionResult Customer([FromBody] object data)
         {
             MasterBal _bal = new MasterBal();

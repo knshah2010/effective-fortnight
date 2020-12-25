@@ -5,6 +5,8 @@ using Framework.Library.Validator;
 using System;
 using Framework.Library.Helper;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Framework.Library.Converter;
 
 namespace Models
 {
@@ -32,7 +34,7 @@ namespace Models
         public string refference_code { get; set; }
         public string plant_code { get; set; }
         public string mcc_plant_code { get; set; }
-        public string bmc_code { get; set; }
+        public string bmc_code { get; set; }      
         public bool is_active { get; set; } = true;
         public string x_col1 { get; set; }
         public string x_col2 { get; set; }
