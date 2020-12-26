@@ -65,7 +65,8 @@ namespace Models
                 Where = new List<ConditionParameter>
                 {
                     new ConditionParameter{PropertyName="purchase_rate_code" },
-                    new ConditionParameter{PropertyName="wef_date",direct_condition="@wef_date <= wef_date and @purchase_rate_code=purchase_rate_code and @dcs_code=dcs_code" }
+                    new ConditionParameter{PropertyName="dcs_code" },
+                    new ConditionParameter{PropertyName="wef_date",direct_condition="@wef_date <= wef_date" }
                 },
 
             };

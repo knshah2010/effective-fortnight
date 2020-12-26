@@ -117,7 +117,7 @@ namespace DataExchange.Areas.Service.BAL
                         CustomerType CustomerTypeModel = NewRepo.Find<CustomerType>(query);
                         if (MemberModel.member_code.Length > CustomerTypeModel.code_length)
                         {
-                            return new CustomResult("success", new CustomResponse { status = "300", msg = "error:member_code:Max Length Should be 4" });
+                            return new CustomResult("success", new CustomResponse { status = "300", msg = "error:member_code:Max Length validation" });
                         }
 
                         Bmc BmcModel = NewRepo.Find<Bmc>(new QueryParam { Where = new List<ConditionParameter> { Condition("bmc_code", MemberModel.dcs_code) } });
