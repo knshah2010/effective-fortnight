@@ -56,7 +56,7 @@ namespace Models
         public CustomerMasterValidator()
         {
             RuleFor(d => d.customer_code).Require();
-            RuleFor(d => d.customer_code_ex).Unique();
+            //RuleFor(d => d.customer_code_ex).Unique().WithMessage("member_code_already_exist");
             RuleFor(d => d.ref_code).Unique();
             RuleFor(d => d.customer_unique_code).Require();
             RuleFor(d => d.customer_name).Require();

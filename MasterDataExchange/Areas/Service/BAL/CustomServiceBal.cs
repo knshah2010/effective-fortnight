@@ -129,24 +129,33 @@ namespace DataExchange.Areas.Service.BAL
                             if (NewModel == null)
                             {
                                 CustomerMasterModel.customer_code_ex = "A" + MemberModel.member_code.PadLeft(CustomerTypeModel.code_length, '0');
-                                int code = NewRepo.Find<int>(new QueryParam
+                                List<CustomerMaster> checkExcode = NewRepo.FindAll<CustomerMaster>(new QueryParam { Where = new List<ConditionParameter> { Condition("customer_code_ex", CustomerMasterModel.customer_code_ex) } }).ToList();
+                                if (checkExcode.Count == 0)
                                 {
-                                    DirectQuery = "select max(cast(ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0)as unsigned))  from tbl_customer_master where substring(customer_code,1,length(concat(union_code,bmc_code)))=concat(union_code,bmc_code)",
-                                });
-                                CustomerMasterModel.customer_code = UnionsModel.union_code + BmcModel.bmc_code + (code + 1);
-                                CustomerMasterModel.ref_code = MemberModel.member_unique_code;
-                                CustomerMasterModel.customer_unique_code = MemberModel.member_unique_code;
-                                CustomerMasterModel.x_col1 = "1#1";
-                                CustomerMasterModel.originating_org_code = CustomerMasterModel.union_code = UnionsModel.union_code;
-                                CustomerMasterModel.customer_name = MemberModel.member_name;
-                                CustomerMasterModel.customer_type = "BULKVEN";
-                                CustomerMasterModel.bmc_code = MemberModel.dcs_code;
-                                CustomerMasterModel.route_code = RouteModel.route_code;
-                                CustomerMasterModel.mobile_no = MemberModel.mobile_no;
-                                CustomerMasterModel.is_active = MemberModel.is_active;
-                                CustomerMasterModel.x_col5 = MemberModel.rate_class;
+                                    int code = NewRepo.Find<int>(new QueryParam
+                                    {
+                                        DirectQuery = "select max(cast(ifnull((substring(customer_code,length(concat(union_code,bmc_code))+1)),0)as unsigned))  from tbl_customer_master where substring(customer_code,1,length(concat(union_code,bmc_code)))=concat(union_code,bmc_code)",
+                                    });
+                                    CustomerMasterModel.customer_code = UnionsModel.union_code + BmcModel.bmc_code + (code + 1);
+                                    CustomerMasterModel.ref_code = MemberModel.member_unique_code;
+                                    CustomerMasterModel.customer_unique_code = MemberModel.member_unique_code;
+                                    CustomerMasterModel.x_col1 = "1#1";
+                                    CustomerMasterModel.originating_org_code = CustomerMasterModel.union_code = UnionsModel.union_code;
+                                    CustomerMasterModel.customer_name = MemberModel.member_name;
+                                    CustomerMasterModel.customer_type = "BULKVEN";
+                                    CustomerMasterModel.bmc_code = MemberModel.dcs_code;
+                                    CustomerMasterModel.route_code = RouteModel.route_code;
+                                    CustomerMasterModel.mobile_no = MemberModel.mobile_no;
+                                    CustomerMasterModel.is_active = MemberModel.is_active;
+                                    CustomerMasterModel.x_col5 = MemberModel.rate_class;
 
-                                Data.Add(new ModelParameter { SaveModel = CustomerMasterModel, ValidateModel = new CustomerMasterValidator() });
+                                    Data.Add(new ModelParameter { SaveModel = CustomerMasterModel, ValidateModel = new CustomerMasterValidator() });
+                                    SaveData(MemberModel.member_unique_code);
+                                }
+                                else
+                                {
+                                    _response.Add(new CustomResponse { status = "300", msg = "error:member_code_already_exist" });
+                                }
                             }
                             else
                             {
@@ -161,8 +170,9 @@ namespace DataExchange.Areas.Service.BAL
                                 NewModel.x_col5 = MemberModel.rate_class;
                                 NewModel.model_operation = "update";
                                 Data.Add(new ModelParameter { SaveModel = NewModel, ValidateModel = new CustomerMasterValidator() });
+                                SaveData(MemberModel.member_unique_code);
                             }
-                            SaveData(MemberModel.member_unique_code);
+                            
                         }
                         else
                         {
