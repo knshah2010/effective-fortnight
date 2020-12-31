@@ -1,3 +1,3 @@
 [submodule "Framework"]
 	path = Framework
-	url = http://dev.everestinstruments.com:10002/emilkpro-erp/framework.git
+	url = http://192.168.1.212:10002/emilkpro-erp/framework.git
