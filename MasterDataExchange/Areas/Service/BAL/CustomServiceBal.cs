@@ -189,6 +189,8 @@ namespace DataExchange.Areas.Service.BAL
             };
             IEnumerable<Shift> shiftList = NewRepo.FindAll<Shift>(Query);
             int code = NewRepo.Find<int>(new QueryParam { DirectQuery = "select IFNULL(max(rate_app_code),0) from tbl_purchase_rate_applicability" });
+            List<CustomResponse> private_response=new List<CustomResponse>();
+
 
             foreach (PurchaseRateApplicability PurchaseRateApplicabilityModel in PurchaseRateApplicabilityList)
             {
@@ -208,6 +210,10 @@ namespace DataExchange.Areas.Service.BAL
                         PurchaseRateApplicabilityModel.wef_date = DateHelper.ParseDate(time);
                         Data.Add(new ModelParameter { SaveModel = PurchaseRateApplicabilityModel, ValidateModel = new PurchaseRateApplicabilityValidator() });
                         SaveData(PurchaseRateApplicabilityModel.applicability_unique_code);
+                        if (result != "success")
+                        {
+                            return new CustomResult("success", new List<CustomResponse> { new CustomResponse { key_code = PurchaseRateApplicabilityModel.applicability_unique_code, status = "300", msg = result }}); 
+                        }
 
                     }
                     else
@@ -241,6 +247,10 @@ namespace DataExchange.Areas.Service.BAL
                                 DcsPurchaseRateApplicabilityModel.applicable_for = CustomerMasterModel.customer_type;
                                 Data.Add(new ModelParameter { SaveModel = DcsPurchaseRateApplicabilityModel, ValidateModel = new DcsPurchaseRateApplicabilityValidator() });
                                 SaveData(PurchaseRateApplicabilityModel.applicability_unique_code);
+                                if (result != "success")
+                                {
+                                    return new CustomResult("success", new List<CustomResponse> { new CustomResponse { key_code = PurchaseRateApplicabilityModel.applicability_unique_code, status = "300", msg = result } });
+                                }
                             }
                             //SaveData(PurchaseRateApplicabilityModel.applicability_unique_code);
                         }
@@ -249,15 +259,17 @@ namespace DataExchange.Areas.Service.BAL
                             _response.Add(new CustomResponse { status = "300", msg = "error:module code not exist" });
                         }
                     }
-                    
+                    private_response.Add(new CustomResponse { key_code = PurchaseRateApplicabilityModel.applicability_unique_code });
 
                 }
                 else
                 {
                     _response.Add(new CustomResponse { status = "300", msg = "error:applicability only for dcs" });
                 }
+
             }
-                return new CustomResult("success", _response);
+            return new CustomResult("success", private_response);
+
         }
 
             private T GetLastRecord<T>(string table) where T : BaseModel

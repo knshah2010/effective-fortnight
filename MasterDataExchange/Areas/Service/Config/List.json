@@ -124,5 +124,9 @@
       }
     ],
     "direct_list": "true"
+  },
+  "download_data": {
+    "sp": "download_data",
+    "require": "p_from_date,p_to_date"
   }
 }

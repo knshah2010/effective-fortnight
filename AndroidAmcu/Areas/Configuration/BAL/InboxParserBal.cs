@@ -3,6 +3,7 @@ using Dapper;
 using Framework.BAL;
 using Framework.CustomDataType;
 using Framework.Library.Helper;
+using Framework.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -81,7 +82,7 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                     using (var transaction = new TransactionScope())
                     {
                         NewRepo.AddWithoutSentbox(_syncLogModel);
-                        if (DataParam["x_col1"]!=null && DataParam["x_col1"].ToString()!="")
+                        if (DataParam["xCol1"]!=null && DataParam["xCol1"].ToString()!="")
                         {
                             NewRepo.AddWithoutSentbox(_inboxModel.table_name, Columns(DataParam,"update"), param, "update");
                         }
@@ -96,11 +97,25 @@ namespace AndroidAmcu.Areas.Configuration.BAL
                 }
                 catch(Exception E)
                 {
-                    InboxConstraint _constraintModel= _inboxModel.Parse<InboxConstraint, Inbox>();
-                    _constraintModel.error_log = E.Message;
-                    _constraintModel.error_timestamp = DateHelper.CurrentDate();
-                    NewRepo.AddWithoutSentbox(_constraintModel);
-                    NewRepo.Delete(_inboxModel);
+                    try
+                    {
+                        InboxConstraint _constraintModel = _inboxModel.Parse<InboxConstraint, Inbox>();
+                        _constraintModel.error_log = E.Message;
+                        _constraintModel.error_timestamp = DateHelper.CurrentDate();
+                        NewRepo.AddWithoutSentbox(_constraintModel);
+                        NewRepo.Delete(_inboxModel);
+                    }
+                    catch(Exception E1)
+                    {
+                        ErrorLog ErrorLogModel = new ErrorLog
+                        {
+                            table_name = "tbl_inbox_constraint",
+                            module_name = "inbox_parsing",
+                            error_log = E1.Message,
+                            error_procedure = _inboxModel.json_text
+                        };
+                        NewRepo.AddWithoutSentbox(ErrorLogModel);
+                    }                    
                 }
             }
         }
